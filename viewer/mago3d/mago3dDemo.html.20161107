@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Cesium and F4D Viewer</title>
+  
+  <link href='../kma/css/colorpicker.css' type='text/css' rel='stylesheet' />
+  
+  <script src="../Build/CesiumUnminified/Cesium.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Atmosphere.js"></script>
+  <script type="text/javascript" src="./f4d/MoveCubeLibsJScript.js"></script>
+  <script type="text/javascript" src="./f4d/SonGeometryJScript.js"></script>
+  <script type="text/javascript" src="./f4d/SonGeometryModifier.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Projects.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Shader.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_ReaderWriter.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Renderer.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Selection.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_VBO_Manager.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_Manager.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_PostFxShader.js"></script>
+  <script type="text/javascript" src="./f4d/F4D_FBO.js"></script>
+  <script type="text/javascript" src="./f4d/PreGL.js"></script>
+  
+  <script src="../kma/js/jquery.min.js"></script>
+  <script type='text/javascript' src='../kma/js/colorpicker.js'></script>
+  
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+	  
+	.colorScale
+	{
+	font-size: 12px;
+	position: absolute;
+	left: 0;
+	background: rgba(42,42,42,0.8);
+	color: white;
+	padding: 10px;
+	border-radius: 4px;
+	height: 500px;
+	width: 100px;
+	text-align: center;
+	z-index: 5;
+	}
+
+	.colorScale.shrink
+	{
+	padding: 4px;
+	width: 45px;
+	height: 15px;
+	overflow: hidden;
+	cursor: pointer;
+	border: 1px solid white;
+	}
+  </style>
+		<!--
+        <input type="file" id="files" name="files[]" multiple  />
+		<output id="list"></output>
+		<input type="file" id="files2" name="files2[]" directory mozDirectory webkitDirectory />
+		<output id="list2"></output> 
+		<p>Count numbers: <output id="result"></output></p>
+		-->
+		
+<script>
+function testFunction(viewer)
+{
+}
+
+function flyToPosition(viewer, lon, lat, alt, heading, pitch, duration)
+{
+	 viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(lon, lat, alt),
+        orientation : {
+            heading : Cesium.Math.toRadians(heading),
+            pitch : Cesium.Math.toRadians(pitch),
+            roll : 0.0
+        },
+		duration: duration
+    });
+}
+
+function doSomething()
+{
+	flyToPosition(viewer, 127.05618, 37.48666, 231.52, -40, -25, 10.0);
+}
+
+function prepareFlyButtons()
+{
+	var divUL = document.getElementById('divUpperLeft');
+    if (!divUL) {
+        divUL = document.createElement('div');
+        divUL.id = 'divUpperLeft';
+        divUL.style.position = "absolute";
+        divUL.style.background = "rgba(0,0,0,0)";
+        divUL.style.left = "10px";
+        divUL.style.top = "10px";
+        divUL.innerHTML = "";
+        divUL.style.zIndex = 2000;
+        document.getElementById("cesiumContainer").appendChild(divUL);
+    }
+	
+	var divContainer = document.createElement("div");
+    divContainer.id = "divSearchContainer";
+    divContainer.style.top = "20px";
+	
+	/*
+	var btnTest = document.createElement("input");
+    btnTest.id = "btnTest";
+    btnTest.type = "button";
+    btnTest.value = "TEST";
+    btnTest.style.width = "80px";
+    btnTest.style.marginLeft = "10px";
+    btnTest.onclick = function() {
+        console.log('yuido clicked');
+		testFunction(viewer);
+    };
+	
+	divContainer.appendChild(btnTest);
+	*/
+	
+	var btnInit = document.createElement("input");
+    btnInit.id = "btnInit";
+    btnInit.type = "button";
+    btnInit.value = "전체";
+    btnInit.style.width = "80px";
+    btnInit.style.marginLeft = "10px";
+    btnInit.onclick = function() {
+        console.log('initial position clicked');
+		flyToPosition(viewer, 128.54953, 36.20619, 18110571.0, 0, -90, 10.0);
+    };
+	
+	divContainer.appendChild(btnInit);
+	
+	var btnYuido = document.createElement("input");
+    btnYuido.id = "btnYuido";
+    btnYuido.type = "button";
+    btnYuido.value = "여의도";
+    btnYuido.style.width = "80px";
+    btnYuido.style.marginLeft = "10px";
+    btnYuido.onclick = function() {
+        console.log('yuido clicked');
+		flyToPosition(viewer, 126.94217, 37.51820, 256.41, 300, -25, 10.0);
+    };
+	
+	divContainer.appendChild(btnYuido);
+	
+	var btnOutdoor = document.createElement("input");
+    btnOutdoor.id = "btnOutdoor";
+    btnOutdoor.type = "button";
+    btnOutdoor.value = "대상건물";
+    btnOutdoor.style.width = "80px";
+    btnOutdoor.style.marginLeft = "10px";
+    btnOutdoor.onclick = function() {
+        console.log('building clicked');
+		// 건기연
+		flyToPosition(viewer, 126.92975, 37.51652, 59.73, 310, 0, 5.0);
+    };
+	
+	divContainer.appendChild(btnOutdoor);
+	
+	var btnIndoor = document.createElement("input");
+    btnIndoor.id = "btnIndoor";
+    btnIndoor.type = "button";
+    btnIndoor.value = "건물실내";
+    btnIndoor.style.width = "80px";
+    btnIndoor.style.marginLeft = "10px";
+    btnIndoor.onclick = function() {
+        console.log('indoor clicked');
+		// 기계실
+		//flyToPosition(viewer, 126.92895, 37.51737, 61.57, 150, -20, 5.0);
+		// 건기연
+		flyToPosition(viewer, 126.92880, 37.51733, 57.32, 310, 0, 12.0);
+		
+    };
+    
+    divContainer.appendChild(btnIndoor);
+	
+	var btnGangnam = document.createElement("input");
+    btnGangnam.id = "btnGangnam";
+    btnGangnam.type = "button";
+    btnGangnam.value = "강남";
+    btnGangnam.style.width = "80px";
+    btnGangnam.style.marginLeft = "10px";
+    btnGangnam.onclick = function() {
+        console.log('gangnam clicked');
+		flyToPosition(viewer, 127.05618, 37.48666, 231.52, -40, -25, 10.0);
+    };
+    
+    divContainer.appendChild(btnGangnam);
+	
+	document.getElementById("divUpperLeft").appendChild(divContainer);
+}
+
+function removeDivForCredit()
+{
+	var bottomContainers = document.getElementsByClassName('cesium-viewer-bottom');
+	
+	for (var i = 0; i < bottomContainers.length; i++) {
+		bottomContainers[i].parentNode.removeChild(bottomContainers[i]);
+	}
+}
+
+function testFunctionForPostRender(args)
+{
+	console.log('post render : ' + args);
+}
+</script>
+
+		
+</head>
+<body>
+	<div id="colorScale" class="colorScale" style="top:50px;">
+		<span>Scale</span>
+		<table id="legendTable">
+			<tr><th>Color</th><th>Value</th></tr>
+			<tr><td>Min</td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td><div class='colorSelector'><div style='background-color:rgb(77,77,77)'></div></div></td><td></td></tr>
+			<tr><td>Max</td><td></td></tr>
+		</table>
+	</div>
+	<script>
+	function rgbToHex(r, g, b)
+	{
+	    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+	}
+	var valueList = [30,35,40,42.5,45,47.5,50,52.5,55];
+	var colorList = [[255,255,217],
+	                 [237,248,177],
+	                 [199,233,180],
+	                 [127,205,187],
+	                 [ 65,182,196],
+	                 [ 29,145,192],
+	                 [ 34, 94,168],
+	                 [ 37, 52,148],
+	                 [  8, 29, 88]];
+	$('.colorScale').on('click',function() {
+		if ($('.colorScale').hasClass('shrink')) {
+			$('.colorScale').removeClass('shrink');
+		} else {
+			$('.colorScale').addClass('shrink');
+		}
+	});
+	$('.colorSelector').each(function(index)
+	{
+		var that = this;
+		var color = colorList[index];
+		var value = valueList[index];
+		$(this).ColorPicker({
+			onSubmit: function(hsb, hex, rgb, el) {
+		        $(el).val(hex);
+		        $(el).ColorPickerHide();
+		    },
+			color: '#00ff00',
+			onShow: function (colpkr) {
+		        $(colpkr).fadeIn(500);
+		        return false;
+		    },
+			onHide: function (colpkr) {
+		        $(colpkr).fadeOut(500);
+		        return false;
+		    },
+			onChange: function (hsb, hex, rgb) {
+		        $(that).children("div:first").css('backgroundColor', '#' + hex);
+		        console.log(hsb, hex, rgb);
+		        updatePointColor(index, rgb);
+		    },
+			onBeforeShow: function (colpkr) {
+		        $(that).ColorPickerSetColor('rgb(0,1,0)');
+		    }
+		})
+		$(that).children("div:first").css('backgroundColor',rgbToHex(color[0],color[1],color[2]));
+		$(that).parent().next('td').html(value);
+		console.log(rgbToHex(color[0],color[1],color[2]));
+		console.log($(that).children("div:first").css('background-color'));
+	})
+	function updatePointColor(index, rgb)
+	{
+		//console.log(/(.*?)rgb\((\d+),\s*(\d+),\s*(\d+)\)/i.exec(color));
+		gColors[index] = new Cesium.Color(rgb.r/255,rgb.g/255,rgb.b/255,1.0);
+		var pointIndex = gIndex[index];
+		for(var i=0; i<pointIndex.length; i++)
+		{
+			gPoints.get(pointIndex[i]).color = gColors[index]; 
+			gPoints.get(pointIndex[i]).outlineColor = gColors[index];
+		}
+	}
+	</script>
+  <div id="cesiumContainer"></div>
+  <script>
+  
+	var providerViewModels = [];
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name : 'ESRI World Imagery',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/esriWorldImagery.png'),
+		tooltip : '\
+World Imagery provides one meter or better satellite and aerial imagery in many parts of the world and lower resolution \
+satellite imagery worldwide.  The map includes NASA Blue Marble: Next Generation 500m resolution imagery at small scales \
+(above 1:1,000,000), i-cubed 15m eSAT imagery at medium-to-large scales (down to 1:70,000) for the world, and USGS 15m Landsat \
+imagery for Antarctica. The map features 0.3m resolution imagery in the continental United States and 0.6m resolution imagery in \
+parts of Western Europe from DigitalGlobe. In other parts of the world, 1 meter resolution imagery is available from GeoEye IKONOS, \
+i-cubed Nationwide Prime, Getmapping, AeroGRID, IGN Spain, and IGP Portugal.  Additionally, imagery at different resolutions has been \
+contributed by the GIS User Community.\nhttp://www.esri.com',
+		creationFunction : function() {
+			return new Cesium.ArcGisMapServerImageryProvider({
+				url : '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+				enablePickFeatures : false
+			});
+		}
+	}));
+		
+	 providerViewModels.push(new Cesium.ProviderViewModel({
+		name : 'Open\u00adStreet\u00adMap',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
+		tooltip : 'OpenStreetMap (OSM) is a collaborative project to create a free editable map \
+of the world.\nhttp://www.openstreetmap.org',
+		creationFunction : function() {
+			return new Cesium.OpenStreetMapImageryProvider({
+				url : '//a.tile.openstreetmap.org/'
+			});
+		}
+	}));
+	
+	 providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Satellite',
+		tooltip: 'Mapbox satellite imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxSatellite.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.satellite'
+			});
+		}
+	}));
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Streets',
+		tooltip: 'Mapbox streets imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxTerrain.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.streets'
+			});
+		}
+	}));
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Streets Classic',
+		tooltip: 'Mapbox streets basic imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxStreets.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.streets-basic'
+			});
+		}
+	}));
+
+	var terrainViewModels = [];
+	terrainViewModels.push(new Cesium.ProviderViewModel({
+		name : 'WGS84 Ellipsoid',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/Ellipsoid.png'),
+		tooltip : 'WGS84 standard ellipsoid, also known as EPSG:4326',
+		creationFunction : function() {
+			return new Cesium.EllipsoidTerrainProvider();
+		}
+	}));
+
+
+	terrainViewModels.push(new Cesium.ProviderViewModel({
+		name : 'STK World Terrain meshes',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/STK.png'),
+		tooltip : 'High-resolution, mesh-based terrain for the entire globe. Free for use on the Internet. Closed-network options are available.\nhttp://www.agi.com',
+		creationFunction : function() {
+			return new Cesium.CesiumTerrainProvider({
+				url : '//assets.agi.com/stk-terrain/world',
+				requestWaterMask : true,
+				requestVertexNormals : true
+			});
+		}
+	}));
+
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+		imageryProviderViewModels : providerViewModels,
+		selectedImageryProviderViewModel : providerViewModels[0],
+		terrainProviderViewModels : terrainViewModels,
+		selectedTerrainProviderViewModel : terrainViewModels[1]
+	});
+	
+	// add fly buttons here - start
+	prepareFlyButtons();
+	
+	removeDivForCredit();
+	// add fly buttons here - end
+	
+	// add post render listner - start
+	//viewer.scene.postRender.addEventListener(testFunctionForPostRender);
+	// add post render listner - end
+
+	viewer.canvas.addEventListener('click', function(e){
+	
+    var mousePosition = new Cesium.Cartesian2(e.clientX, e.clientY);
+ 
+    var ellipsoid = viewer.scene.globe.ellipsoid;
+    var cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
+    if (cartesian) {
+        var cartographic = ellipsoid.cartesianToCartographic(cartesian);
+        var longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
+        var latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
+
+        console.log('clicked position : ' + longitudeString + ', ' + latitudeString);
+		
+		var camLon = viewer.scene.camera._positionCartographic.longitude;
+		var camLat = viewer.scene.camera._positionCartographic.latitude;
+		var camAlt = viewer.scene.camera._positionCartographic.height;
+		
+		var camLonString = Cesium.Math.toDegrees(camLon).toFixed(5);
+		var camLatString = Cesium.Math.toDegrees(camLat).toFixed(5);
+		
+		console.log('camera position : ' + camLonString + ', ' + camLatString + ', ' + camAlt);
+    } else {
+        console.log('Globe was not picked');
+    }
+	
+}, false);
+
+	var provider = new Cesium.WebMapServiceImageryProvider({
+		//url : 'http://192.168.10.38:8081/geoserver/uos/wms',
+		url : 'http://localhost:8081/geoserver/uos/wms',
+		layers : 'uos:UOS_upload_image',
+		parameters : {
+			service : 'WMS',
+			version : '1.1.0',
+			request : 'GetMap',
+            transparent : 'true',
+            //tiled : 'true',
+            format : 'image/png'
+			,time : '2016-04-01'
+        },
+		proxy: new Cesium.DefaultProxy('/proxy/')
+	});
+
+	viewer.imageryLayers.addImageryProvider(provider);
+
+	//var viewer = new Cesium.Viewer('cesiumContainer');
+	viewer.load_TEST_Files();
+
+	//setTimeout(doSomething, 4000);
+	
+		var gLatLons;
+		var gVals;
+		var gPoints;
+		var gColors = [];
+		var gIndex = [];
+		var gLevels = valueList;
+		$('.colorSelector').each(function(index)
+		{
+			var color = colorList[index];
+			gColors.push(new Cesium.Color(color[0]/255,color[1]/255,color[2]/255,1.0));
+			gIndex[index] = new Array();
+		});
+
+		gPoints = viewer.scene.primitives.add(new Cesium.PointPrimitiveCollection());
+		$.ajax({
+			url : '../kma/HWRF.json',
+			dataType : 'json',
+			success : function(data)
+			{
+				if(data.error)
+				{
+					console.log(data.error);
+					return false;
+				}
+				gLatLons = data.lls;
+				gVals = data.vals;
+				
+				for (var i=0; i<gVals.length; i++)
+				{
+					var color = 0;
+					
+					if(gVals[i] < gLevels[0])
+					{
+						color = 0;
+					}
+					else if(gVals[i] >= gLevels[gLevels.length-1])
+					{
+						color = gLevels.length-1;
+					}
+					else
+					{
+						for (var j=0; j<gLevels.length-1; j++)
+						{
+							if(gVals[i] >= gLevels[j] && gVals[i] < gLevels[j+1])
+							{
+								color = j + 1;
+								break;
+							}
+						}						
+					}
+					//console.log(i, gVals[i], color);
+					gIndex[color].push(i);
+					gPoints.add({
+						position: new Cesium.Cartesian3.fromDegrees(gLatLons[i][0],gLatLons[i][1],gLatLons[i][2]),
+						color: gColors[color],
+						pixelSize: 2.0,
+						//scaleByDistance: new Cesium.NearFarScalar(2e6, 1.5, 1.5e7, 0.2),
+						scaleByDistance: new Cesium.NearFarScalar(2e5, 5, 1.5e6, 0.2),
+						outlineColor: gColors[color],
+						outlineWidth: 0.5,
+						show: true
+					});
+				}
+			},
+			error : function(e)
+			{
+				console.log(e);
+				JSON.parse(e.responseText);
+			}
+		});
+	</script>
+</body>
+</html>

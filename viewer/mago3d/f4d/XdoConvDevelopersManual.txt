@@ -1,0 +1,898 @@
+
+
+
+// 이 놈은 머머 하는 놈. 무슨 값을 디폴트로 갖는다. 어떤 값은 가질 수 없다.
+
+class basicPoint2D
+properties
+	double dx;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double dy;
+	// Represents a value of the y axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	basicPoint2D(void);
+	// This is the constructor. Is a public function.
+	
+	~basicPoint2D(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class basicPoint3D
+properties
+	double dx;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double dy;
+	// Represents a value of the y axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double dz;
+	// Represents a value of the z axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	basicPoint3D(void);
+	// This is the constructor. Is a public function.
+	
+	~basicPoint3D(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class basicBoundingBox
+properties
+	basicPoint3D *min;
+	// This is the point that represents the minimun values, in a cartesian coord system, of the axis-aligned bounding box. Is a public variable.
+	
+	basicPoint3D *max;
+	// This is the point that represents the maximum values, in a cartesian coord system, of the axis-aligned bounding box. Is a public variable.
+
+methods
+	basicBoundingBox(void);
+	// This is the constructor. Is a public function.
+	
+	~basicBoundingBox(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class fPoint2D
+properties
+	float x;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	float y;
+	// Represents a value of the y axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	fPoint2D(void);
+	// This is the constructor. Is a public function.
+	
+	~fPoint2D(void);
+	// This is the destructor. Is a public function.
+
+	bool Is_Coincident_withPoint2D(fPoint2D *fpoint2d, float error);
+	// Returns true if the input point "fpoint2d" is coincident with this, with a tolerance "error" for each axis. Otherwise returs false. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class fPoint3D
+properties
+	float x;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	float y;
+	// Represents a value of the y axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	float z;
+	// Represents a value of the z axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	fPoint3D(void);
+	// This is the constructor. Is a public function.
+	
+	~fPoint3D(void);
+	// This is the destructor. Is a public function.
+
+	bool Is_Coincident_withPoint3D(fPoint3D *fpoint3d, float error);
+	// Returns true if the input point "fpoint3d" is coincident with this, with a tolerance "error" for each axis. Otherwise returs false. Is a public function.
+
+	void Set(float _x, float _y, float _z);
+	// Assign "_x" value to this x, "_y" value to this y and "_z" value to this z. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class fVertex3D
+properties
+	fPoint3D *m_point3d;
+	// This represents the position of the vertex in a cartesian coord system. Is a public variable.
+	
+	fPoint3D *m_normal;
+	// This represents the normal vector of the vertex in a cartesian coord system. Is a public variable.
+	
+	fPoint2D *m_texCoord;
+	// This is the 2d texture coordinates of an image if exists. Is a public variable.
+
+	int m_idx_inList;
+	// If the vertex is a member of a list, then this variable can be used to stock the position in the list. The default value is -1. Is a public variable.
+
+	fVertex3D *m_mergeableVertex;
+	// This is used in the coincident vertices elimination process. The default value is null. Is a public variable.
+	
+methods
+	fVertex3D(void);
+	// This is the constructor. Is a public function.
+	
+	~fVertex3D(void);
+	// This is the destructor. Is a public function.
+
+	bool Is_MergeableVertex(fVertex3D *fvtx, float error);
+//-------------------------------------------------------------------------------------------------------------------
+
+
+struct float3
+properties
+	float x;
+	// Represents a 4bytes real value. Is a public variable.
+	
+	float y;
+	// Represents a 4bytes real value. Is a public variable.
+	
+	float z;
+	// Represents a 4bytes real value. Is a public variable.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+struct byte4
+properties
+	char x;
+	// Represents a 1byte value. Is a public variable.
+	
+	char y;
+	// Represents a 1byte value. Is a public variable.
+	
+	char z;
+	// Represents a 1byte value. Is a public variable.
+	
+	char w;
+	// Represents a 1byte value. Is a public variable.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+struct ushort2
+properties
+	unsigned short x;
+	// Represents a 2byte value. Is a public variable.
+	
+	unsigned short y;
+	// Represents a 2byte value. Is a public variable.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+struct interleavedData
+properties
+	float3 point3d;
+	// Represents 3 4bytes real values. Is a public variable.
+	
+	ushort2 texCoord;
+	// Represents 2 2bytes values. Is a public variable.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class VBO_Object
+properties
+	std::vector<float> m_floatPointsValues_array;
+	// Vector where can be accumulate float values that each 3 represents positions.  Is a public variable.
+	
+	std::vector<float> m_floatNormalsValues_array;
+	// Vector where can be accumulate float values that each 3 represents normals.  Is a public variable.
+	
+	std::vector<char> m_byteNormalsValues_array;
+	// Vector where can be accumulate byte values that each 3 represents normals.  Is a public variable.
+	
+	std::vector<short> m_shortIndices_array;
+	// Vector where can be accumulate short values that represents indices.  Is a public variable.
+	
+	std::vector<float> m_floatTexCoordValues_array;
+	// Vector where can be accumulate float values that each 2 represents texture coordinates.  Is a public variable.
+	
+	std::vector<unsigned char> m_byteTexCoordValues_array;
+	// Vector where can be accumulate byte values that each 2 represents texture coordinates.  Is a public variable.
+	
+	std::vector<unsigned short> m_shortTexCoordValues_array;
+	// Vector where can be accumulate unsigned short values that each 2 represents texture coordinates.  Is a public variable.
+
+	std::vector<interleavedData> m_interleavedValues_array;
+	// Vector where accumulate interleavedData values. Is a public variable.
+
+methods
+	VBO_Object(void);
+	// This is the constructor. Is a public function.
+	
+	~VBO_Object(void);
+	// This is the destructor. Is a public function.
+	
+	void Save_InterleavedMode(FILE *f);
+	// This saves in the file "f" the interleavedData array stored in "m_interleavedValues_array". Is a public function.
+	
+	void Save_PosTexCoordsInterleavedMode_andByteNormals(FILE *f);
+	// This saves in the file "f" the interleavedData array stored in "m_interleavedValues_array", and the byte normals values array. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class VBO_ObjectsList
+properties
+	std::vector<VBO_Object*> m_vec_vboObjects;
+	// Vector where accumulate VBO_Objects. Is a public variable.
+	
+methods
+	VBO_ObjectsList(void);
+	// This is the constructor. Is a public function.
+	
+	~VBO_ObjectsList(void);
+	// This is the destructor. Is a public function.
+
+	VBO_Object* New_VBO_Object();
+	// Creates a VBO_Object, strores the object and returns it. Is a public function.
+	
+	void Save_InterleavedMode(std::string &file_path);
+	// For all interleavedData stored in "m_vec_vboObjects", saves the interleaved array in the specified file. Is a public function.
+	
+	void Save_PosTexCoordsInterleavedMode_andByteNormals(std::string &file_path);
+	// Creates a file, and for all interleavedData stored in "m_vec_vboObjects", saves the interleaved array and the byte normals array in the create file. Is a public function.
+	
+	void Save_PosTexCoordsInterleavedMode_andByteNormals(FILE *f);
+	// For all interleavedData stored in "m_vec_vboObjects", saves the interleaved array and the byte normals array in the specified file. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+struct IDX_and_VERTEX
+properties
+	unsigned short idx;
+	// Index of the vertex. Is a public variable.
+	
+	fVertex3D* fvertex;
+	// Pointer to vertex. Is a public variable.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+class  xdo_project
+properties
+	int indexed_count;
+	// Indices count. The default value is zero. Is a public variable.
+	
+	std::vector<short> m_vec_indices;
+	// Vector on to store the indices values. Is a public variable.
+
+	char type;
+	// Objects type. Is a public variable.
+	
+	int objID;
+	// Objects Identifier. Is a public variable.
+	
+	char keyLen;
+	// Objects key length. Is a public variable.
+	
+	char key[512];
+	// Objects key. Is a public variable.
+	
+	basicBoundingBox *box;
+	// Objects bounding box. Is a public variable.
+	
+	float altitude;
+	// Objects altitude. Is a public variable.
+	
+	char faceNum;
+	// Number of faces. Is a public variable.
+	
+	int vertex_count;
+	// Objects vertex count. Is a public variable.
+	
+	std::vector<fVertex3D*> m_vec_fVertex3d;
+	// Vector that contains the objects vertex. Is a public variable.
+	
+	std::vector<IDX_and_VERTEX> m_vec_idxAndVertex; // use for merge coincident vertices.***
+	// Vector that contains "IDX_and_VERTEX" data structure. Used for merging concident vertices. Is a public variable.
+
+	int color;
+	// Objects color. Is a public variable.
+	
+	char imageLevel;
+	// LOD level of the image texture. Is a public variable.
+	
+	char imageNameLen;
+	// Image name's length. Is a public variable.
+	
+	char imageName[128];
+	// Image name. Is a public variable.
+
+	int nailImageSize;
+	// Embedded image size in bytes. Is a public variable.
+	
+	unsigned char *image_bytes; // Embedded image.***
+	// Embedded image. Is a public variable.
+	
+	int officialImage_Size;
+	// The biggest image size in bytes. Is a public variable.
+	
+	unsigned char *officialImage_bytes; // The biggest image.***
+	// The biggest image. Is a public variable.
+	
+	int officialImage_1_Size;
+	// The 2n biggest image size in bytes. Is a public variable.
+	
+	unsigned char *officialImage_1_bytes; // The 2nd biggest image.***
+	// The 2n biggest image. Is a public variable.
+	
+	int officialImage_2_Size;
+	// The 3rd biggest image size in bytes. Is a public variable.
+	
+	unsigned char *officialImage_2_bytes; // The 3rd biggest image.***
+	// The 3rd biggest image. Is a public variable.
+	
+	int officialImage_3_Size;
+	// The smallest image size in bytes. Is a public variable.
+	
+	unsigned char *officialImage_3_bytes; // The smallest image.***
+	// The smallest image. Is a public variable.
+	
+	std::string nailImage_fullPath;
+	// Embedded image full path. Is a public variable.
+	
+	xdoModelObject *xdoMO;
+	// Pointer to xdoModelObject. Is a public variable.
+
+	int fileLen;
+	// xdo file size in bytes. Is a public variable.
+
+	// F4d format variables.********************
+	F4D_Header *f4d_header;
+	// Pointer to F4D_Header's object. Is a public variable.
+	
+	VBO_ObjectsList *m_vboObjectsList;
+	// Pointer to VBO_ObjectsList object. Is a public variable.
+	
+methods
+	xdo_project(void);
+	// This is the constructor. Is a public function.
+	
+	~xdo_project(void);
+	// This is the destructor. Is a public function.
+
+	fVertex3D* New_fVertex3D();
+	// Creates a new vertex, stores it into the "m_vec_fVertex3d" and returns it. Is a public function.
+
+	void Save_XDO_3002(std::string &file_path);
+	// This saves the project in xdo format version 3002. Is a public function.
+	
+	void Save_NewFormat(std::string &file_path);
+	// This saves the project in the new format. Is a public function.
+	
+	void Set_idxInList_fVertices();
+	// For all vertices stored in "m_vec_fVertex3d", sets the position in the list. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class xdo_ver_3001 :public xdo_project
+methods
+	xdo_ver_3001(void);
+	// This is the constructor. Is a public function.
+	
+	~xdo_ver_3001(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class XDOREADERDLL xdo_ver_3002 : public xdo_project
+methods
+	xdo_ver_3002(void);
+	// This is the constructor. Is a public function.
+	
+	~xdo_ver_3002(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class xdoIndexHeader
+properties
+	int Level;   
+	// From xdo Real3D Model Index Header, zone level. Is a public variable.
+	
+	int IDX;  
+	// Longitude.  Is a public variable.
+	
+	int IDY; 
+	// Latitude.  Is a public variable.
+	
+	int ObjectsCount; 
+	// Objects count. Is a public variable.
+	
+	std::string m_indexFileName_withOutExtension;
+	// This index header file raw name. Is a public variable.
+
+methods
+	xdoIndexHeader(void);
+	// This is the constructor. Is a public function.
+	
+	~xdoIndexHeader(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class xdoModelObject
+properties
+	char version[4];     
+	// From Real3D Model Object, version. Is a public variable.
+	
+	char type;   
+	// Object's type. Is a public variable.
+	
+	char keyLen;    
+	// Object's key length. Is a public variable.
+	
+	char key[MAX_NAME_LONG]; 
+	// Object's key. Is a public variable.
+	
+	float altitude;  
+	// Object's altitude. Is a public variable.
+	
+	char imgLevel;  
+	// Image's level. Is a public variable.
+	
+	char dataFileNameLen;  
+	// Object's file name length. Is a public variable.
+	
+	char dataFileName[MAX_NAME_LONG];  
+	// Object's file name. Is a public variable.
+	
+	char imgFileNameLen;  
+	// Image's file name length. Is a public variable.
+	
+	char imgFileName[MAX_NAME_LONG];  
+	// Image's file name. Is a public variable.
+
+	basicPoint2D *centerPos;
+	// Object's center position in geographic coord system. Is a public variable.
+	
+	basicBoundingBox *box;  
+	// Object's boudary box. Is a public variable.
+
+methods
+	xdoModelObject(void);
+	// This is the constructor. Is a public function.
+	
+	~xdoModelObject(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class xdoReader
+properties
+	xdoIndexHeader m_xdoIdxHeader;
+	// Real3D Model Index Header. Is a public variable.
+	
+	std::string m_folder_path;
+	// Used to store a folder path. Is a public variable.
+	
+	std::string m_inputFolderPath;
+	// Input data folder path. Is a public variable.
+	
+	std::string m_ouputFolderPath;
+	// Ouput data folder path. Is a public variable.
+
+
+	std::vector<xdoModelObject*> m_vec_xdoModelObjects;
+	// Vector that stores xdo model objects. Is a public variable.
+	
+	std::vector<xdo_project*> m_vec_xdoProjects;
+	// Vector that stores xdo projects. Is a public variable.
+	
+	std::vector<std::string> m_vec_3_f4dFilePaths; 
+	// Vector that stores f4d file's rawname paths. Is a public variable.
+
+	int original_vertex_count; 
+	// Vertices count in the original data. Is a public variable.
+	
+	int reduced_vertex_count;
+	// Vertices count once reduced coincident vertices. Is a public variable.
+	
+	int triangles_count;
+	// Triangles counter. Is a public variable.
+	
+	bool m_unRotate_XdoGeometry;
+	// Used to decide if wants rectify the pre-rotation of the xdo geometry. Is a public variable.
+	
+	bool m_invertYAxis;
+	// Used to decide if wants invert y axis values. Is a public variable.
+	
+	bool m_rotateGeometry_forRightHandCoordSystem;
+	// Used to decide if wants rotate the geometry for used in a right hand rule globe. Is a public variable.
+
+	F4D_TerranTile *m_terranTile;
+	// Pointer to F4D_TerranTile object. Is a public variable.
+	
+	F4D_Project *m_f4dProject_aux;
+	// Pointer to F4D_Project object. Is a public variable.
+
+methods
+	xdoReader(void);
+	// This is the constructor. Is a public function.
+	
+	~xdoReader(void);
+	// This is the destructor. Is a public function.
+
+	void Covert_XdoProjects_toF4DProjects();
+	// Converts from xdo to new format (f4d) all xdo-projects stored in "m_vec_xdoProjects". Is a public function.
+	
+	void Covert_XdoProject_toF4DProject(xdo_project *xdoProj);
+	// Converts xdo-project to new format(f4d). Is a public function.
+
+	void Delete_xdoModelObjects();
+	// This deletes all xdo model objects stored in "m_vec_xdoModelObjects".  Is a public function.
+	
+	void Delete_xdoProjects();
+	// This deletes all xdo projects stored in "m_vec_xdoProjects".  Is a public function.
+
+	XDO_VERSION getXdoVersion(xdoModelObject *xdoMO);
+	// This returns the version of the xdo model object "xdoMO".  Is a public function.
+
+	xdoModelObject* New_xdoModelObject();
+	// Creates a new xdo model object, stores it in "m_vec_xdoModelObjects", and returns it. Is a public function.
+	
+	bool Open_AllXdoHeader(const std::string& inputFolderPath, const std::string& ouputFolderPath, bool calculate_motherTileSize, int tileQuadtreeDepth);
+	// This is the start function in the data format conversion process. 
+	// inputFolderPath: folder path on there are the xdo data.
+	// ouputFolderPath: folder path on wants to save the result data in the conversion process.
+	// calculate_motherTileSize: boolean that indicates if wants that the program calculates the fitted tile size of the input data.
+	// tileQuadtreeDepth: tile's quadtree depth.
+	
+	bool OpenXdoHeader(const std::string& path, const std::string& folder_path);
+	// Reads the specified xdo header by "path". ( xdo header = *.dat ).
+	// path: full path to the xdo header file.
+	// folder_path: folder path, used to read xdo projects and the images.
+	
+	void OpenXdoProjects();
+	// For each xdoModelObjects readed in the xdo header, this reads and creates one xdo project.
+	
+	void OpenXdo_andConvertToF4D_allFolderContained(const std::string& folder_path);
+	// This converts all xdo projects stored in "folder_path". Is a public function.
+	// folder_path: Indicates the folder on there are xdo projects folders.
+
+	void set_TerrainTileSize(double lon_min, double lon_max, double lat_min, double lat_max);
+	// Sets the terrain tile size, with angles in degree. Is a public function.
+
+private methods
+	void FindMergeableVertex_forfVertex(fVertex3D *fVtx_master, xdo_project *xdoProj, float error);
+	// Given a vertex "fVtx_master", this finds coincident vertices and sets the "m_mergeableVertex" of its.  Is a private function.
+	// fVtx_master: this is the given vertex, and the program search all the coincident vertices.
+	// xdoProj: The searching coincident vertices process is for the "xdoProj" xdo project.
+	// error: Indicates the tolerance for each axis, when comparing vertices position.
+	
+	void MergeCoincidentPoints_XdoProjects();
+	// This finds and deletes coincident vertices for all xdo projects stored in "m_vec_xdoProjects". Is a private function.
+	
+	void MergeCoincidentPoints_XdoProject(xdo_project *xdoProj, float error);
+	// This finds and deletes coincident vertices for given xdo projects "xdoProj". Is a private function.
+	
+	bool Get_ListOfFolders_inDirectory(const std::string& directory_path, std::vector<std::string> & vec_result_folderNames);
+	// Given a directory "directory_path", this finds all folder names stored in the directory.  Is a private function.
+	
+	bool Get_ListOfXdoIndexHeaderFiles_inDirectory(const std::string& directory_path, std::vector<std::string> & vec_result_folderNames);
+	// Given a directory "directory_path", this finds all xdo header names stored in the directory.  Is a private function.
+	
+	xdo_ver_3002* OpenXdoProject_Ver_3002(FILE *f, xdoModelObject *xdoMO);
+	// This reads the xdo project "f" of the xdo model object.  Is a private function.
+	
+	void Rotate_Project_forRightHandRuleGlobe(xdo_project *xdoProj);
+	// Rotates the xdo geometry for right hand rule globe. Is a private function.
+	
+	void UnRotate_Project(xdo_project *xdoProj);
+	// Unrotates the pre-rotated xdo geometry. Is a private function.
+//-------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------
+
+
+class F4D_dPoint2D
+properties
+	double x;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double y;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	F4D_dPoint2D(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_dPoint2D(void);
+	// This is the destructor. Is a public function.
+
+	void set(double _x, double _y);
+	// Assign _x value to x and _y value to y.  Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class GAIAF4DFORMATDLL F4D_dPoint3D
+properties
+	double x;
+	// Represents a value of the x axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double y;
+	// Represents a value of the y axis in a cartesian coord system. The default value is zero. Is a public variable.
+	
+	double z;
+	// Represents a value of the z axis in a cartesian coord system. The default value is zero. Is a public variable.
+
+methods
+	F4D_dPoint3D(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_dPoint3D(void);
+	// This is the destructor. Is a public function.
+
+	void set(double _x, double _y, double _z);
+	// Assign _x value to x , _y value to y and _z value to z.  Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class F4D_Header
+properties
+	char m_global_unique_id[MAX_ID_LENGTH];
+	// Project's unique identifier. Is a public variable.
+	
+	int m_global_unique_id_length;
+	// Project's unique identifier length. Is a public variable.
+	
+	char m_version[6];
+	// The version. Is a public variable.
+
+	double m_longitude;
+	// Longitude angle in degrees of geographic coordinates. Is a public variable.
+	
+	double m_latitude;
+	// Latitude angle in degrees of geographic coordinates. Is a public variable.
+	
+	float m_altitude;
+	// Altitude over the sea level in meters. Is a public variable.
+
+	// Projects BoundingBox in relative cartesian.********************
+	float m_min_x; 
+	// Minimum value in the x axis of the bounding box. Is a public variable.
+	
+	float m_max_x; 
+	// Maximum value in the x axis of the bounding box. Is a public variable.
+	
+	float m_min_y; 
+	// Minimum value in the y axis of the bounding box. Is a public variable.
+	
+	float m_max_y; 
+	// Maximum value in the y axis of the bounding box. Is a public variable.
+	
+	float m_min_z; 
+	// Minimum value in the z axis of the bounding box. Is a public variable.
+	
+	float m_max_z; 
+	// Maximum value in the z axis of the bounding box. Is a public variable.
+
+	
+	unsigned char m_imageLod_count;
+	// Texture LOD's count. Is a public variable.
+
+methods
+	F4D_Header(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_Header(void);
+	// This is the destructor. Is a public function.
+
+	void Read_Header_Definitive(const std::string &file_path);
+	// Reads a f4d header file. Is a public function.
+	
+	void Save_Header_Definitive(const std::string &file_path);
+	// Saves a f4d header file. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class F4D_IndexFile
+properties
+	double m_longitude;
+	// Longitude angle in degrees of geographic coordinates. Is a public variable.
+	
+	double m_latitude;
+	// Latitude angle in degrees of geographic coordinates. Is a public variable.
+	
+	std::string m_f4dRawNamePath;
+	// This is the raw name including the owner folder name of the f4d project. Is a public variable.
+	
+methods
+	F4D_IndexFile(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_IndexFile(void);
+	// This is the destructor. Is a public function.
+
+	bool read(FILE *f);
+	// Reads the f4d index file. Is a public function.
+	
+	bool save(FILE *f);
+	// Saves the f4d index file. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class F4D_Project
+properties
+	std::vector<F4D_Vertex3D*> m_vec_vertices;
+	// Vector that contains the vertices of the project. Is a public variable.
+	
+	F4D_Header *m_f4dHeader;
+	// Pointer to f4d header. Is a public variable.
+	
+	int m_texture;
+	// Texture image. Is a public variable.
+	
+	std::string m_texImage_filePath;
+	// Texture image file path. Is a public variable.
+	
+methods
+	F4D_Project(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_Project(void);
+	// This is the destructor. Is a public function.
+
+	F4D_Vertex3D* new_f4dVertex();
+	// Creates a vertex, stores in the "m_vec_vertices" and returns it. Is a public function.
+
+	void Read_File(std::string& file_path);
+	// Reads a f4d project file. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class F4D_TerranTile
+
+	//           +-----+-----+
+	//           |  3  |  2  |
+	//           +-----+-----+
+	//           |  0  |  1  |
+	//           +-----+-----+
+	
+properties
+	F4D_TerranTile *m_owner_tile;
+	// Pointer to the owner tile. If this is the mother tile, then owner tile is a null pointer. Is a public variable.
+	
+	int m_depth;
+	// Tile's quadtree depth. Is a public variable.
+	
+	int m_numberName;
+	// Int value that represents the position of the sub tile produced by the quadtree division. Is a public variable.
+	
+	// longitude domain = -180 to 180.***
+	// latitude domain = -90 to 90.***
+
+	double m_longitude_min;
+	// Longitude angle in degrees of geographic coordinates. The minimun value is -180 and the maximun value is 180. This must be lower than longitude_max. Is a public variable.
+	
+	double m_longitude_max;
+	// Longitude angle in degrees of geographic coordinates. The minimun value is -180 and the maximun value is 180. This must be bigger than longitude_min. Is a public variable.
+	
+	double m_latitude_min;
+	// Latitude angle in degrees of geographic coordinates. The minimun value is -90 and the maximun value is 90. This must be lower than latitude_max. Is a public variable.
+	
+	double m_latitude_max;
+	// Latitude angle in degrees of geographic coordinates. The minimun value is -90 and the maximun value is 90. This must be bigger than latitude_min. Is a public variable.
+
+	std::vector<F4D_TerranTile*> m_vec_subTiles;
+	// Vector that contains the sub tile produced for quadtree division. If this is the lowest tile, then this has no sub tiles. Is a public variable.
+	
+	std::vector<F4D_IndexFile*> m_vec_f4dIndexFiles;
+	// f4d index files list of the tile. Is a public variable.
+	
+methods
+	F4D_TerranTile(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_TerranTile(void);
+	// This is the destructor. Is a public function.
+
+	void calculate_fittedTileSize();
+	// This calculates the tile size of all f4d projects. Is a public function.
+	
+	int get_maxDepth();
+	// Returns the max quadtree depth of the tile. Is a public function.
+
+	void make_tileQuadTree(int quadtree_depth, bool calculate_motherTileSize);
+	// Makes the quadtree's division.  Is a public function.
+	// quadtree_depth: Depth of the quadtree. Input value.
+	// calculate_motherTileSize: boolean that decides for calculating the tile size. Intup value.
+	
+	F4D_IndexFile* new_f4dIndexFile();
+	// Creates a new f4d index file, stores it in "m_vec_f4dIndexFiles" and returns it.  Is a public function.
+
+	void read_file(FILE *f);
+	// Reads a f4d terran tile file. Is a public function.
+	
+	void read_file(std::string &file_path);
+	// Reads a f4d terran tile file. Is a public function.
+
+	void save_file(std::string &file_path);
+	// Saves this f4d terran tile file. Is a public function.
+	
+	void save_file(FILE *f);
+	// Saves this f4d terran tile file. Is a public function.
+	
+	void save_serviceFormat(std::string &folder_path);
+	// Saves this f4d terran tile file as a service format style. Is a public function.
+
+	void set_dimension(double lon_min, double lon_max, double lat_min, double lat_max);
+	// Sets the tile dimensions. Is a public function.
+	
+	void set_motherTileSize(double lon_min, double lon_max, double lat_min, double lat_max);
+	// Sets the mother tile dimensions. Is a public function.
+
+private methods
+	bool intersect(double lon, double lat);
+	// Determines if a geographic coordenades intersects with this tile. Is a public function.
+	// lon: Longitude in angle degree of the geographic coordenades system. Input value.
+	// lat: Latitude in angle degree of the geographic coordenades system. Input value.
+	
+	void make_4subTiles();
+	// Makes the 4 sub tile produced by the quadtree division. Is a public function.
+	
+	void set_dimensions_subTiles();
+	// Sets the dimensions of the sub tiles produced by the quadtree division. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+class F4D_Vertex3D
+properties
+	F4D_dPoint3D *m_dPoint3d;
+	// Pointer to f4d dPoint3d that represents the position of the vertex. Is a public variable.
+	
+	F4D_dPoint3D *m_dNormal;
+	// Pointer to f4d dPoint3d that represents the normal vector of the vertex. Is a public variable.
+	
+	F4D_dPoint2D *m_texCoord;
+	// Pointer to f4d sPoint2d that represents the texture coordinates of the vertex.  Is a public variable.
+	
+methods
+	F4D_Vertex3D(void);
+	// This is the constructor. Is a public function.
+	
+	~F4D_Vertex3D(void);
+	// This is the destructor. Is a public function.
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
