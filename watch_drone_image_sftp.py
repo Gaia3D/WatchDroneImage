@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 # 참고: https://github.com/gorakhargosh/watchdog/
 
-import sys
 import time
 import logging
 import os
-import subprocess
 import threading
 
-from Accounts._metadata import sel32or64
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-import psycopg2
-from osgeo import gdal
-from geoserver.catalog import Catalog
 
 import paramiko
 
@@ -24,7 +18,6 @@ class CompleteEventHandler(PatternMatchingEventHandler):
     PATTERN = ["*.jpg"]
     IMAGE_TYPE = "jgw"
     WATCH_FOLDER = "C:\\temp\\UOS_FTP\\Result"
-    SERVICE_FOLDER = "c:\\temp\\UOS_upload_image"
 
     # set sftp setting
     SFTP_SERVER = None
@@ -41,7 +34,6 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
 
-        #self.connectDB()
         self.connectSftp()
 
     def wait_complete_event(self, path):
@@ -86,7 +78,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         while (True):
             if os.access(worldFile, os.W_OK):
                 break
-            time.sleep(1)
+            time.sleep(0.5)
 
         reomte_worldFile = os.path.join(self.SFTP_FOLDER, worldFileName)
 
@@ -107,7 +99,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
         sftp = self.SFTP_SERVER.open_sftp()
 
-        sftp.put(localFile, remoteFile)
+        sftp.put(localFile, remoteFile.replace("\\","/"))
 
         sftp.close()
         print "Send OK : " + localFile
