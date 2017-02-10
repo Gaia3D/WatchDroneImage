@@ -6,6 +6,7 @@ import time
 import logging
 import os
 import threading
+import platform
 
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
@@ -20,6 +21,8 @@ class CompleteEventHandler(PatternMatchingEventHandler):
     IMAGE_TYPE = "jgw"
     WATCH_FOLDER = "/Users/jsKim-pc/Documents/2017/uos_test_image/ftp"
 
+    OS_SYSTEM = None
+
     # set ftp setting
     FTP_SERVER = None
     FTP_FOLDER = "/Result"
@@ -33,7 +36,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=None, ignore_patterns=None,
                  ignore_directories=False, case_sensitive=False):
         patterns = self.PATTERN
-
+        self.OS_SYSTEM = platform.system()
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
 
     def wait_complete_event(self, path):
@@ -98,6 +101,10 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         origin = os.path.join(self.WATCH_FOLDER, fileName)
         remote = os.path.join(self.FTP_FOLDER, fileName)
         remoteTmp = os.path.join(self.FTP_FOLDER_TMP, fileName + ".tmp")
+
+        if self.OS_SYSTEM == 'Windows':
+            remoteTmp = remoteTmp.replace("\\","/")
+            remote = remote.replace("\\","/")
 
         ftp.storbinary("STOR "+ remoteTmp, open(origin, 'rb'))
 
