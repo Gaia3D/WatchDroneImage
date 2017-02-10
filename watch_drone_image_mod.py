@@ -18,8 +18,10 @@ class CompleteEventHandler(PatternMatchingEventHandler):
     __watch_dict = {}
 
     WAIT_SECOND = 10
-    PATTERN = ["*.jpg"]
-    IMAGE_TYPE = "jgw"
+    # PATTERN = ["*.jpg"]
+    # WORLD_EXT = "jgw"
+    PATTERN = ["*.png"]
+    WORLD_EXT = "pnw"
     WATCH_FOLDER = "C:\\temp\\UOS_FTP\\Result"
     SERVICE_FOLDER = "c:\\temp\\UOS_upload_image"
 
@@ -89,18 +91,19 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         trans_file = os.path.join(dst_folder, "{}_nb_4326.tif".format(org_name))
         tiled_file = os.path.join(dst_folder, "{}_nb_4326_tiled.tif".format(org_name))
 
-        worldFile = ("{}." + self.IMAGE_TYPE).format(os.path.splitext(path)[0])
+        worldFile = ("{}." + self.WORLD_EXT).format(os.path.splitext(path)[0])
         print worldFile
         while(True):
             if os.access(worldFile, os.W_OK):
                 break
             time.sleep(1)
 
-        subprocess.call(['nearblack', '-of', 'GTiff', '-color', '205,205,205', '-setalpha', path, '-o', nb_file])
-        subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
+        # subprocess.call(['nearblack', '-of', 'GTiff', '-color', '205,205,205', '-setalpha', path, '-o', nb_file])
+        # subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
+        subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  path, trans_file])
         subprocess.call(['gdal_translate', '-of', 'GTiff', '-co', 'TILED=YES', trans_file, tiled_file])
         subprocess.call(['gdaladdo', '-r', 'average', tiled_file, '2', '4', '8', '16', '32', '64'])
-        os.remove(nb_file)
+        # os.remove(nb_file)
         os.remove(trans_file)
 
         image_name = "{}_nb_4326_tiled.tif".format(org_name)
