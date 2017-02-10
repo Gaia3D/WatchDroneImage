@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 참고: https://github.com/gorakhargosh/watchdog/
 
+import sys
 import time
 import logging
 import os
@@ -9,7 +10,7 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
-import paramiko
+from ftplib import FTP
 
 class CompleteEventHandler(PatternMatchingEventHandler):
     _WAIT_SECOND = 1
@@ -17,24 +18,23 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
     PATTERN = ["*.jpg"]
     IMAGE_TYPE = "jgw"
-    WATCH_FOLDER = "C:\\temp\\UOS_FTP\\Result"
+    WATCH_FOLDER = "/Users/jsKim-pc/Documents/2017/uos_test_image/ftp"
 
-    # set sftp setting
-    SFTP_SERVER = None
-    SFTP_FOLDER = "/home/gaia3d/imageFTP"
-    SFTP_IP = "192.168.10.14"
-    SFTP_PORT = 22
-    SFTP_USER = "gaia3d"
-    SFTP_PWD = "gaia3dgaia3d"
-    SFTP_KEY = ""
+    # set ftp setting
+    FTP_SERVER = None
+    FTP_FOLDER = "/Result"
+    FTP_FOLDER_TMP = "/temp"
+    FTP_IP = ""
+    FTP_PORT = 21
+    FTP_TIMEOUT = 3
+    FTP_USER = ""
+    FTP_PWD = ""
 
     def __init__(self, patterns=None, ignore_patterns=None,
                  ignore_directories=False, case_sensitive=False):
         patterns = self.PATTERN
 
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
-
-        self.connectSftp()
 
     def wait_complete_event(self, path):
         if self.__watch_dict.has_key(path):
@@ -68,9 +68,8 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         src_folder = os.path.dirname(path)
         print 'src_folder : ' + src_folder
         org_name, ext = os.path.splitext(os.path.basename(path))
-        remote_file = os.path.join(self.SFTP_FOLDER, os.path.basename(path))
 
-        self.imageSftp(path, remote_file)
+        self.imageFTP(os.path.basename(path))
 
         worldFileName = ("{}." + self.IMAGE_TYPE).format(org_name)
         worldFile = os.path.join(src_folder, worldFileName)
@@ -80,29 +79,33 @@ class CompleteEventHandler(PatternMatchingEventHandler):
                 break
             time.sleep(0.5)
 
-        reomte_worldFile = os.path.join(self.SFTP_FOLDER, worldFileName)
+        self.imageFTP(worldFileName)
 
-        self.imageSftp(worldFile, reomte_worldFile)
+    def connectFTP(self):
 
-    def connectSftp(self):
-        paramiko.util.log_to_file(os.path.join(os.path.dirname(__file__), "sftp.log"))
+        ftp = FTP()
+        ftp.connect(self.FTP_IP, self.FTP_PORT, self.FTP_TIMEOUT)
+        ftp.login(self.FTP_USER, self.FTP_PWD)
 
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=self.SFTP_IP, port=self.SFTP_PORT, username=self.SFTP_USER, password=self.SFTP_PWD)
-        # ssh.connect(hostname=self.SFTP_IP, port=self.SFTP_PORT, username=self.SFTP_USER, pkey=self.SFTP_PKEY)
+        return ftp
 
-        self.SFTP_SERVER = ssh
+    def imageFTP(self, fileName):
 
-    def imageSftp(self, localFile, remoteFile):
-        print "Send File : " + localFile
+        ftp = self.connectFTP()
 
-        sftp = self.SFTP_SERVER.open_sftp()
+        print "Send File : " + fileName
 
-        sftp.put(localFile, remoteFile.replace("\\","/"))
+        origin = os.path.join(self.WATCH_FOLDER, fileName)
+        remote = os.path.join(self.FTP_FOLDER, fileName)
+        remoteTmp = os.path.join(self.FTP_FOLDER_TMP, fileName + ".tmp")
 
-        sftp.close()
-        print "Send OK : " + localFile
+        ftp.storbinary("STOR "+ remoteTmp, open(origin, 'rb'))
+
+        ftp.rename(remoteTmp, remote)
+
+        print "Send OK : " + fileName
+
+        ftp.close()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO,
