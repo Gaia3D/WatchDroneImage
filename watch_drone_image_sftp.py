@@ -89,6 +89,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         ftp = FTP()
         ftp.connect(self.FTP_IP, self.FTP_PORT, self.FTP_TIMEOUT)
         ftp.login(self.FTP_USER, self.FTP_PWD)
+        ftp.set_pasv(False)
 
         return ftp
 
