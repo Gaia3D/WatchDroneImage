@@ -1,2 +1,4 @@
 eclipse.preferences.version=1
 encoding/watch_drone_image_mod.py=utf-8
+encoding/watch_drone_image_mod_jpg.py=utf-8
+encoding/watch_drone_image_sftp.py=utf-8
