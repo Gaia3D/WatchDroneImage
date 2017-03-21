@@ -1,47 +1,59 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- Use correct character set. -->
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-  <title>Cesium and F4D Viewer</title>
+<!-- Use correct character set. -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<title>Cesium and F4D Viewer</title>
 
-  <link rel="stylesheet" href="./style.css">
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-  
-  <script src="../Build/CesiumUnminified/Cesium.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Atmosphere.js"></script>
-  <script type="text/javascript" src="./f4d/MoveCubeLibsJScript.js"></script>
-  <script type="text/javascript" src="./f4d/SonGeometryJScript.js"></script>
-  <script type="text/javascript" src="./f4d/SonGeometryModifier.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Projects.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Shader.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_ReaderWriter.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Renderer.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Selection.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_VBO_Manager.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Manager.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_PostFxShader.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_FBO.js"></script>
-  <script type="text/javascript" src="./f4d/PreGL.js"></script>
-  <script type="text/javascript" src="./f4d/F4D_Geometry.js"></script>
-   
-   
-  <style>
-      @import url(../Build/Cesium/Widgets/widgets.css);
-      html, body, #cesiumContainer {
-          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
-      }
-  </style>
+<link rel="stylesheet" href="./style.css">
 
-		
+<script>
+  var baseUrl = "http://lgs.mago3d.com:8080";
+</script>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<script src="../Build/CesiumUnminified/Cesium.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Atmosphere.js"></script>
+<script type="text/javascript" src="./f4d/MoveCubeLibsJScript.js"></script>
+<script type="text/javascript" src="./f4d/SonGeometryJScript.js"></script>
+<script type="text/javascript" src="./f4d/SonGeometryModifier.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Projects.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Shader.js"></script>
+<script type="text/javascript" src="./f4d/F4D_ReaderWriter.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Renderer.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Selection.js"></script>
+<script type="text/javascript" src="./f4d/F4D_VBO_Manager.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Manager.js"></script>
+<script type="text/javascript" src="./f4d/F4D_PostFxShader.js"></script>
+<script type="text/javascript" src="./f4d/F4D_FBO.js"></script>
+<script type="text/javascript" src="./f4d/PreGL.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Geometry.js"></script>
+
+
+<style>
+@import url(../Build/Cesium/Widgets/widgets.css);
+
+html, body, #cesiumContainer {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+</style>
+
+
 <script>
 
 var provider = null;
-var url = 'http://lgs.mago3d.com:8080/geoserver/uos/wms';
+var url = baseUrl + '/geoserver/uos/wms';
+var baseUrl = "";
+var urlBackup = url;
 	
 var poiList = [
 			  {"lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	
@@ -120,8 +132,7 @@ function changeAutoRefresh(objId){
 }
 	
 
-function flyToPosition(viewer, lon, lat, alt, heading, pitch, duration)
-{
+function flyToPosition(viewer, lon, lat, alt, heading, pitch, duration){
 	 viewer.camera.flyTo({
         destination : Cesium.Cartesian3.fromDegrees(lon, lat, alt),
         orientation : {
@@ -133,13 +144,7 @@ function flyToPosition(viewer, lon, lat, alt, heading, pitch, duration)
     });
 }
 
-function doSomething()
-{
-	flyToPosition(viewer, 127.05618, 37.48666, 231.52, -40, -25, 10.0);
-}
-
-function prepareFlyButtons()
-{
+function prepareFlyButtons(){
 
 	var divUL = document.getElementById('divUpperLeft');
     if (!divUL) {
@@ -154,164 +159,30 @@ function prepareFlyButtons()
         document.getElementById("cesiumContainer").appendChild(divUL);
     }
 	
-	var divContainer = document.createElement("div");
-    divContainer.id = "divSearchContainer";
-    divContainer.style.top = "20px";
-	
-	/*
-	var btnTest = document.createElement("input");
-    btnTest.id = "btnTest";
-    btnTest.type = "button";
-    btnTest.value = "TEST";
-    btnTest.style.width = "80px";
-    btnTest.style.marginLeft = "10px";
-    btnTest.onclick = function() {
-        console.log('yuido clicked');
-		testFunction(viewer);
-    };
-	
-	divContainer.appendChild(btnTest);
-	*/
-	
-	var btnInit = document.createElement("input");
-    btnInit.id = "btnInit";
-    btnInit.type = "button";
-    btnInit.value = "전체";
-    btnInit.style.width = "80px";
-    btnInit.style.marginLeft = "10px";
-    btnInit.onclick = function() {
-        console.log('initial position clicked');
-		flyToPosition(viewer, 128.54953, 36.20619, 18110571.0, 0, -90, 10.0);
-    };
-	
-	divContainer.appendChild(btnInit);
-	
-	var btnYuido = document.createElement("input");
-    btnYuido.id = "btnYuido";
-    btnYuido.type = "button";
-    btnYuido.value = "여의도";
-    btnYuido.style.width = "80px";
-    btnYuido.style.marginLeft = "10px";
-    btnYuido.onclick = function() {
-        console.log('yuido clicked');
-		flyToPosition(viewer, 126.94217, 37.51820, 256.41, 300, -25, 10.0);
-    };
-	
-	divContainer.appendChild(btnYuido);
-	
-	var btnOutdoor = document.createElement("input");
-    btnOutdoor.id = "btnOutdoor";
-    btnOutdoor.type = "button";
-    btnOutdoor.value = "대상건물1";
-    btnOutdoor.style.width = "80px";
-    btnOutdoor.style.marginLeft = "10px";
-    btnOutdoor.onclick = function() {
-        console.log('building clicked');
-		// 건기연
-		flyToPosition(viewer, 126.92975, 37.51652, 59.73, 310, 0, 5.0);
-    };
-	
-	divContainer.appendChild(btnOutdoor);
-	
-	var btnOutdoor2 = document.createElement("input");
-    btnOutdoor2.id = "btnOutdoor2";
-    btnOutdoor2.type = "button";
-    btnOutdoor2.value = "대상건물2";
-    btnOutdoor2.style.width = "80px";
-    btnOutdoor2.style.marginLeft = "10px";
-    btnOutdoor2.onclick = function() {
-        console.log('building clicked');
-		// 건기연
-		flyToPosition(viewer, 126.92902, 37.51692, 57.200934197465415, 40, 0, 5.0);
-    };
-	
-	divContainer.appendChild(btnOutdoor2);
-	
-	var btnIndoor = document.createElement("input");
-    btnIndoor.id = "btnIndoor";
-    btnIndoor.type = "button";
-    btnIndoor.value = "건물실내";
-    btnIndoor.style.width = "80px";
-    btnIndoor.style.marginLeft = "10px";
-    btnIndoor.onclick = function() {
-        console.log('indoor clicked');
-		// 기계실
-		//flyToPosition(viewer, 126.92895, 37.51737, 61.57, 150, -20, 5.0);
-		// 건기연
-		flyToPosition(viewer, 126.92880, 37.51733, 57.32, 310, 0, 12.0);
-		
-    };
-    
-    divContainer.appendChild(btnIndoor);
-	
-	var btnGangnam = document.createElement("input");
-    btnGangnam.id = "btnGangnam";
-    btnGangnam.type = "button";
-    btnGangnam.value = "강남";
-    btnGangnam.style.width = "80px";
-    btnGangnam.style.marginLeft = "10px";
-    btnGangnam.onclick = function() {
-        console.log('gangnam clicked');
-		flyToPosition(viewer, 127.05618, 37.48666, 231.52, -40, -25, 10.0);
-    };
-    
-    divContainer.appendChild(btnGangnam);
-	
-	var btnDrone = document.createElement("input");
-    btnDrone.id = "btnDrone";
-    btnDrone.type = "button";
-    btnDrone.value = "드론영상";
-    btnDrone.style.width = "80px";
-    btnDrone.style.marginLeft = "10px";
-    btnDrone.onclick = function() {
-        console.log('drone image area clicked');
-		flyToPosition(viewer, 127.58374, 37.09220, 2230.8844647920923, 0, -90, 10.0);
-    };
-    
-    divContainer.appendChild(btnDrone);
-	
-	document.getElementById("divUpperLeft").appendChild(divContainer);
-}
-
-function removeDivForCredit()
-{
-	var bottomContainers = document.getElementsByClassName('cesium-viewer-bottom');
-	
-	for (var i = 0; i < bottomContainers.length; i++) {
-		bottomContainers[i].parentNode.removeChild(bottomContainers[i]);
-	}
-	
-}
-
-function testFunctionForPostRender(args)
-{
-	console.log('post render : ' + args);
 }
 
 </script>
 
-		
+
 </head>
 <body>
 
-<div id="wrap" >
-	<div class="control" style="z-index:10000;">
-    	<div class="place">
-        	<p>
-            	장소
-            </p>
-        	<ul>
-            	<li class="on" id="place00" onclick="changePlace(this.id);">지구</li>
-                <li id="place01" onclick="changePlace(this.id);">광나루 드론공원</li>
-                <li id="place02" onclick="changePlace(this.id);">경기도 이천시</li>
-                <li id="place03" onclick="changePlace(this.id);">여의도</li>
-                <li id="place04" onclick="changePlace(this.id);">실내 바라보기</li>
-                <li id="place05" onclick="changePlace(this.id);">실내 바라보기2</li>
-                <li id="place06" onclick="changePlace(this.id);">건물실내</li>
-            </ul>
-        </div>
+	<div id="wrap">
+		<div class="control" style="z-index: 10000;">
+			<div class="place">
+				<p>장소</p>
+				<ul>
+					<li class="on" id="place00" onclick="changePlace(this.id);">지구</li>
+					<li id="place01" onclick="changePlace(this.id);">광나루 드론공원</li>
+					<li id="place02" onclick="changePlace(this.id);">경기도 이천시</li>
+					<li id="place03" onclick="changePlace(this.id);">여의도</li>
+					<li id="place04" onclick="changePlace(this.id);">실내 바라보기</li>
+					<li id="place05" onclick="changePlace(this.id);">실내 바라보기2</li>
+					<li id="place06" onclick="changePlace(this.id);">건물실내</li>
+				</ul>
+			</div>
 
-<!--		
+			<!--		
         <div class="basemap">
         	<p>
             	배경지도
@@ -331,21 +202,20 @@ function testFunctionForPostRender(args)
                 <li id="drMap01" onclick="changeDrMap(this.id);">off</li>
             </ul>
         </div>
--->        
-        
-        <div class="auto">
-        	<p>
-            	자동갱신
-            </p>
-        	<ul>
-                <li class="on" id="autoRefresh00" onclick="changeAutoRefresh(this.id);">on</li>
-                <li id="autoRefresh01" onclick="changeAutoRefresh(this.id);">off</li>
-            </ul>
-        </div>
-    </div>
-    <!-- END CONTROL -->
-  <div class="map" id="cesiumContainer"></div>
-  <script>
+-->
+
+			<div class="auto">
+				<p>자동갱신</p>
+				<ul>
+					<li class="on" id="autoRefresh00"
+						onclick="changeAutoRefresh(this.id);">on</li>
+					<li id="autoRefresh01" onclick="changeAutoRefresh(this.id);">off</li>
+				</ul>
+			</div>
+		</div>
+		<!-- END CONTROL -->
+		<div class="map" id="cesiumContainer"></div>
+		<script>
   
 	var providerViewModels = [];
 
@@ -438,6 +308,7 @@ of the world.\nhttp://www.openstreetmap.org',
 		}
 	}));
 
+	
 	var viewer = new Cesium.Viewer('cesiumContainer', {
 		timeline : false
 		,animation : false
@@ -448,54 +319,27 @@ of the world.\nhttp://www.openstreetmap.org',
 		,selectedTerrainProviderViewModel : terrainViewModels[1]
 	});
 	
-/*	
-	viewer.canvas.addEventListener('click', function(e){
-	
-		var mousePosition = new Cesium.Cartesian2(e.clientX, e.clientY);
-	 
-		var ellipsoid = viewer.scene.globe.ellipsoid;
-		var cartesian = viewer.camera.pickEllipsoid(mousePosition, ellipsoid);
-		if (cartesian) {
-			var cartographic = ellipsoid.cartesianToCartographic(cartesian);
-			var longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(5);
-			var latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(5);
-
-			console.log('clicked position : ' + longitudeString + ', ' + latitudeString);
-			
-			var camLon = viewer.scene.camera._positionCartographic.longitude;
-			var camLat = viewer.scene.camera._positionCartographic.latitude;
-			var camAlt = viewer.scene.camera._positionCartographic.height;
-			
-			var camLonString = Cesium.Math.toDegrees(camLon).toFixed(5);
-			var camLatString = Cesium.Math.toDegrees(camLat).toFixed(5);
-			
-			console.log('camera position : ' + camLonString + ', ' + camLatString + ', ' + camAlt);
-		} else {
-			console.log('Globe was not picked');
-		}
-	
-	},
-	false);
-*/
-	
-var provider = null;
-var url = 'http://lgs.mago3d.com:8080/geoserver/uos/wms';
-var urlBackup = url;
 	
 	function addLiveDroneLayer(index) {
-		provider = new Cesium.WebMapServiceImageryProvider({
+	    var now = new Date();
+	    var rand = ( now - now % 5000) / 5000;
+
+	    provider = new Cesium.WebMapServiceImageryProvider({
 			//url : 'http://192.168.10.38:8081/geoserver/uos/wms',
 			//url : 'http://lgs.mago3d.com:8080/geoserver/uos/wms',
 			url : url,
 			layers : 'uos:uos_upload_image',
 			parameters : {
-				service : 'WMS',
-				version : '1.1.1',
-				request : 'GetMap',
-				transparent : 'true',
-				//tiled : 'true',
-				format : 'image/png'
+				service : 'WMS'
+				,version : '1.1.1'
+				,request : 'GetMap'
+				,transparent : 'true'
+				//,tiled : 'true'
+				,format : 'image/png'
 				,time : 'P1Y/PRESENT'
+		    	,rand:rand
+		    	,asdf:"asdf"
+				
 			}
 			//,proxy: new Cesium.DefaultProxy('/proxy/')
 		});
@@ -513,40 +357,40 @@ var urlBackup = url;
 		else 
 			url = null;
 			
-		provider = null
+		provider = null;
 		//viewer.imageryLayers.
 	}
 
+	
+	/*
+	var lowerLayer = addLiveDroneLayer();
+	var lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
+	
 	var upperLayer = addLiveDroneLayer();
 	var upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
 	
-	var lowerLayer = addLiveDroneLayer();
-	var lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
+	*/
+	
+	var lowerLayer = null;
+	var lowerLayerIndex = 0;
+	
+	var upperLayer = addLiveDroneLayer();
+	var upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer)
 	
 	var refreshPeriod = 5000;
 	var timeloop = null;
 
 	function flipPrv() {
-		//viewer.imageryLayers.raiseToTop(lowerLayer);
-		//var tempLayer = upperLayer;
-		//upperLayer = lowerLayer;
-		//lowerLayer = tempLayer;
-
-		var tempLayer = lowerLayer;
+		
+		if(lowerLayer != null)
+			viewer.imageryLayers.remove(lowerLayer);
+		
+		lowerLayerIndex = upperLayerIndex;
 		lowerLayer = upperLayer;
-		upperLayer = tempLayer;
-		
-		viewer.imageryLayers.remove(lowerLayer);
+
+		upperLayer = addLiveDroneLayer();
+		//lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
 		upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
-		//viewer.imageryLayers.add(lowerLayer, upperLayerIndex);	
-		lowerLayer = addLiveDroneLayer(upperLayerIndex);
-		
-		lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
-		upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
-		//console.log("lId:"+lowerLayerIndex+" UId:"+upperLayerIndex);
-		
-		//viewer.imageryLayers.remove(upperLayer);
-		//upperLayer = addLiveDroneLayer();
 
 		timeloop = setTimeout(flipPrv, refreshPeriod);
 	}
