@@ -175,7 +175,7 @@ f4d_renderer.prototype.render_F4D_neoRefLists = function(GL, neoRefList_array, n
 					if(tex_id == undefined)
 					{
 						// Load the texture.***
-						var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+						var filePath_inServer = baseUrl + "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
 						f4d_manager.f4d_readerWriter.readF4D_neoReferenceTexture_inServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 						f4d_manager.backGround_fileReadings_count ++;
 						continue;
@@ -456,7 +456,7 @@ f4d_renderer.prototype.forceRender_F4D_neoRefLists = function(GL, neoRefList_arr
 					if(tex_id == undefined)
 					{
 						// Load the texture.***
-						var filePath_inServer = "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
+						var filePath_inServer = baseUrl + "/F4D_GeometryData/"+neoBuilding.buildingFileName+"/Images/"+neoReference.texture.texture_image_fileName;
 						f4d_manager.f4d_readerWriter.readF4D_neoReferenceTexture_inServer(GL, filePath_inServer, neoReference.texture, neoBuilding, f4d_manager);
 						f4d_manager.backGround_fileReadings_count ++;
 						continue;

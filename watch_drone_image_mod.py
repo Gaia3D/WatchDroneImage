@@ -18,22 +18,24 @@ class CompleteEventHandler(PatternMatchingEventHandler):
     __watch_dict = {}
 
     WAIT_SECOND = 10
-    PATTERN = ["*.jpg"]
-    IMAGE_TYPE = "jgw"
-    WATCH_FOLDER = "C:\\temp\\UOS_FTP\\Result"
-    SERVICE_FOLDER = "c:\\temp\\UOS_upload_image"
+    #PATTERN = ["*.jpg"]
+    #WORLD_EXT = "jgw"
+    PATTERN = ["*.png"]
+    WORLD_EXT = "pgw"
+    WATCH_FOLDER = "/tools/watchDroneImages/UOS_FTP/Result"
+    SERVICE_FOLDER = "/tools/watchDroneImages/uos_upload_image"
 
     HTTP = 'http://'
-    WATCH_URL = 'localhost:8080'
+    WATCH_URL = 'lgs.mago3d.com:8080'
 
-    GEOSERVER_URL = 'localhost:8081'
+    GEOSERVER_URL = 'lgs.mago3d.com:8080'
     GEOSERVER_USER = 'admin'
     GEOSERVER_PASSWORD = 'geoserver'
-    GEOSERVER_LAYER_NAME = 'UOS_upload_image'
+    GEOSERVER_LAYER_NAME = 'uos_upload_image'
     
-    DATABASE_URL = 'localhost'
+    DATABASE_URL = 'lgs.mago3d.com'
     DATABASE_USER = 'postgres'
-    DATABASE_PASSWORD = 'gaia3d'
+    DATABASE_PASSWORD = 'postgres'
     DATABASE_NAME = 'uos_image'
     DATABASE_TABLE_NAME = '\"' + GEOSERVER_LAYER_NAME + '\"'
     
@@ -46,6 +48,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
     def __init__(self, patterns=None, ignore_patterns=None,
             ignore_directories=False, case_sensitive=False):
+        patterns = self.PATTERN
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
 
         self.connectDB()
@@ -84,24 +87,36 @@ class CompleteEventHandler(PatternMatchingEventHandler):
             dst_folder = src_folder
         else:
             dst_folder = self.SERVICE_FOLDER
+
         org_name, ext = os.path.splitext(os.path.basename(path))
         nb_file = os.path.join(dst_folder, "{}_nb.tif".format(org_name))
         trans_file = os.path.join(dst_folder, "{}_nb_4326.tif".format(org_name))
         tiled_file = os.path.join(dst_folder, "{}_nb_4326_tiled.tif".format(org_name))
 
-        worldFile = ("{}." + self.IMAGE_TYPE).format(os.path.splitext(path)[0])
+
+        worldFile = ("{}." + self.WORLD_EXT).format(os.path.splitext(path)[0])
+
         print worldFile
         while(True):
+			
+			#print os.access(worldFile, os.W_OK)
+			
             if os.access(worldFile, os.W_OK):
                 break
             time.sleep(1)
 
-        subprocess.call(['nearblack', '-of', 'GTiff', '-color', '205,205,205', '-setalpha', path, '-o', nb_file])
-        subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
+        print path ,'\t', 'process starting....1'
+        #subprocess.call(['nearblack', '-of', 'GTiff', '-color', '205,205,205', '-setalpha', path, '-o', nb_file])
+        #subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
+        subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  path, trans_file])
+        print path ,'\t', 'process starting....2'
         subprocess.call(['gdal_translate', '-of', 'GTiff', '-co', 'TILED=YES', trans_file, tiled_file])
+        print path ,'\t', 'process starting....3'
         subprocess.call(['gdaladdo', '-r', 'average', tiled_file, '2', '4', '8', '16', '32', '64'])
-        os.remove(nb_file)
+        # os.remove(nb_file)
         os.remove(trans_file)
+
+        print path ,'\t', 'process starting....4'
 
         image_name = "{}_nb_4326_tiled.tif".format(org_name)
         self.insertDB(image_name,dst_folder)
@@ -148,8 +163,8 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         result = self.cur.fetchone()
 
         cat = Catalog(self.HTTP + self.GEOSERVER_URL + "/geoserver/rest",username = self.GEOSERVER_USER, password=self.GEOSERVER_PASSWORD)
-        print self.HTTP + self.GEOSERVER_URL + "/geoserver/rest/workspaces/uos/coveragestores/" + "uos_image/coverages/" + self.DATABASE_TABLE_NAME + ".xml"
-        coverage = cat.get_resource_by_url(self.HTTP + self.GEOSERVER_URL + "/geoserver/rest/workspaces/uos/coveragestores/" + "uos_image/coverages/" + self.GEOSERVER_LAYER_NAME + ".xml")
+        print self.HTTP + self.GEOSERVER_URL + "/geoserver/rest/workspaces/uos/coveragestores/" + "uos_upload_image/coverages/" + self.DATABASE_TABLE_NAME + ".xml"
+        coverage = cat.get_resource_by_url(self.HTTP + self.GEOSERVER_URL + "/geoserver/rest/workspaces/uos/coveragestores/" + "uos_upload_image/coverages/" + self.GEOSERVER_LAYER_NAME + ".xml")
 
         coverage.native_bbox = (str(result[0]),str(result[1]),str(result[2]),str(result[3]),"EPSG:4326")
         cat.save(coverage)

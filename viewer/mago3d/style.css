@@ -1,0 +1,71 @@
+@charset "utf-8";
+
+/* RESET CSS */
+* { margin:0; padding:0; outline:0; vertical-align:top; }
+article, aside, details, figcaption, figure, footer, header, hgroup, menu nav, section { display:block; }
+ul, ol, dl { list-style:none; }
+img, video { max-width:100%; border:0; vertical-align:top; }
+a {vertical-align:top; text-decoration:none; color:#000; }
+table { border-collapse:collapse; border-spacing:0; }
+input, select { vertical-align:middle; }
+html, body { margin:0; padding:0; height:100%; }
+body, th, td, input, select, textarea { color:#444; font-family:'Malgun Gothic','돋움',dotum, sans-serif; font-size:13px; line-height:1.5em;}
+button { cursor:pointer; font-family:'Malgun Gothic','돋움'; }
+
+
+/* LAYOUT */
+#wrap {
+position:relative;
+height:100%;
+}
+.map {
+height:100%;
+background-color:#eee;
+}
+.control {
+overflow:hidden;
+position:absolute;
+left:50%;
+margin:0px 0 0 -300px;
+padding:3px 3px 5px 5px;
+text-align:center;
+background-color:#16151c;
+border-radius:0 0 10px 10px;
+opacity:0.9;
+z-index:10000;
+}
+.control div {
+display:inline-block;
+margin-right:5px;
+padding:1px 5px;
+background:#2f2e37;
+border-radius:7px;
+}
+.control div p {
+font-size:11px;
+color:#afadbc;
+margin:-2px 0 0 0;
+}
+.control ul li {
+display:inline-block;
+padding:1px 7px 2px 5px;
+color:#fff;
+cursor:pointer;
+border-radius:10px;
+font-size:14px;
+}
+.control ul li * {
+vertical-align:middle;
+}
+.control ul li:hover {
+background-color:#1c1b24;
+}
+.control ul li.on {
+color:#44434d;
+background:#fff;	
+}
+.control ul li.on:hover {
+color:#fff;
+background-color:#1c1b24;
+
+}

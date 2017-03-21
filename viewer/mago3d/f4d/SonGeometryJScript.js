@@ -1567,7 +1567,7 @@ f4d_Matrix4.prototype.getMultipliedByMatrix = function(matrix, resultMat)
 	{
 		var intersectedSubBox = this.get_IntersectedSubBox_byPoint3D(eye_x, eye_y, eye_z);
 		
-		if(intersectedSubBox != null && intersectedSubBox._indicesArray.length > 0)
+		if(intersectedSubBox != null)
 		{
 			result_visibleIndicesArray = intersectedSubBox._indicesArray;
 		}
@@ -3346,10 +3346,16 @@ f4d_TerranTile.prototype.get_intersectedSmallestTiles = function(frustumVolume, 
 
 f4d_TerranTile.prototype.get_intersectedTiles = function(frustumVolume, intersectedTiles_array, boundingSphere_Aux)
 {
+	if(this.position == undefined ||
+	  this.position.x == undefined ||
+	  this.position.y == undefined ||
+	  this.position.z == undefined)
+		return;
+
 	// Cesium dependency.***
 	if(boundingSphere_Aux == undefined)
 		boundingSphere_Aux = new Cesium.BoundingSphere();
-	
+
 	var intersectedPoints_count = 0;
 	boundingSphere_Aux.radius = this.radius;
 	boundingSphere_Aux.center.x = this.position.x;
