@@ -374,6 +374,9 @@ of the world.\nhttp://www.openstreetmap.org',
 	var lowerLayer = null;
 	var lowerLayerIndex = 0;
 	
+	var middleLayer = null;
+	var middleLayerIndex = 0;
+	
 	var upperLayer = addLiveDroneLayer();
 	var upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer)
 	
@@ -385,8 +388,11 @@ of the world.\nhttp://www.openstreetmap.org',
 		if(lowerLayer != null)
 			viewer.imageryLayers.remove(lowerLayer);
 		
-		lowerLayerIndex = upperLayerIndex;
-		lowerLayer = upperLayer;
+		lowerLayerIndex = middleLayerIndex;
+		lowerLayer = middleLayer;
+
+		middleLayerIndex = upperLayerIndex;
+		middleLayer = upperLayer;
 
 		upperLayer = addLiveDroneLayer();
 		//lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
