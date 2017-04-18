@@ -22,7 +22,11 @@
 <div id='map'></div>
 
 <script>
-  var WMS_URL = "http://lgs.mago3d.com:8080/geoserver/wms";
+  var baseUrl = location.protocol + "//" + location.hostname+(location.port ? ':'+location.port:'' );
+
+  //var WMS_URL = "http://lgs.mago3d.com:8080/geoserver/wms";
+  
+  var WMS_URL = baseUrl + '/geoserver/wms';
   var WMS_CAPABILITIES_URL = WMS_URL + "?service=wms&version=1.1.1&request=GetCapabilities";
   var WMS_LAYER = "uos:uos_upload_image";
   var REFLASH_TIME = 10000;
@@ -35,7 +39,9 @@
   function onInit() {
     // 지도 콘트롤 초기화
     map = L.map('map', {
-      center: [37.54749505311631, 127.1195197109250],
+        //center: [37.170221, 128.472697], //영월
+        //center: [37.54749505311631, 127.1195197109250], //울산
+        center: [35.565735376565776, 129.3136686086655], //광나루
       zoom: 18,
     });
     

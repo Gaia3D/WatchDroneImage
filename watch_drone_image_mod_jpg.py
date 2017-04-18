@@ -105,18 +105,13 @@ class CompleteEventHandler(PatternMatchingEventHandler):
                 break
             time.sleep(1)
 
-        print path ,'\t', 'process starting....1'
         subprocess.call(['nearblack', '-of', 'GTiff', '-color', '205,205,205', '-setalpha', path, '-o', nb_file])
         subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
         #subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  path, trans_file])
-        print path ,'\t', 'process starting....2'
         subprocess.call(['gdal_translate', '-of', 'GTiff', '-co', 'TILED=YES', trans_file, tiled_file])
-        print path ,'\t', 'process starting....3'
         subprocess.call(['gdaladdo', '-r', 'average', tiled_file, '2', '4', '8', '16', '32', '64'])
         # os.remove(nb_file)
         os.remove(trans_file)
-
-        print path ,'\t', 'process starting....4'
 
         image_name = "{}_nb_4326_tiled.tif".format(org_name)
         self.insertDB(image_name,dst_folder)

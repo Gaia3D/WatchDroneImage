@@ -48,7 +48,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
     def __init__(self, patterns=None, ignore_patterns=None,
             ignore_directories=False, case_sensitive=False):
-        if patterns:
+        if not patterns:
             patterns = self.PATTERN
             
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
@@ -182,4 +182,5 @@ if __name__ == "__main__":
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
+        
     observer.join()

@@ -12,7 +12,36 @@
 <link rel="stylesheet" href="./style.css">
 
 <script>
-  var baseUrl = "http://lgs.mago3d.com:8080";
+	//var baseUrl = "http://lgs.mago3d.com:8080";
+	var baseUrl = location.protocol + "//" + location.hostname+(location.port ? ':'+location.port:'' );
+	
+	var provider = null;
+	var url = baseUrl + '/geoserver/uos/wms';
+	//var baseUrl = "";
+	var urlBackup = url;
+		
+	var poiList = [
+	     {"lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
+	     , {"lon":127.1204 , "lat":37.54683, "alt":1200, "heading":0, "pitch":-90, "duration":6 }			// 광나루
+	     , {"lon":127.58374, "lat":37.09220, "alt":2230.8844647920923, "heading": 0, "pitch":-90, "duration":4.0 }	// 경기도 이천시
+	     , {"lon":128.472697 , "lat":37.170221, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 영월 드론공역
+	     , {"lon":129.313668 , "lat":35.565735, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 재난안전연구원
+	     , {"lon":126.94217, "lat":37.51820, "alt":256.41, "heading":300, "pitch":-25, "duration":7.0 }	// 여의도
+	     , {"lon":126.92902, "lat":37.51692, "alt":57.200934197465415, "heading":40, "pitch":0, "duration":5.0 } // 실내 바라보기1
+	     , {"lon":126.92895, "lat":37.51737, "alt":61.57, "heading":150, "pitch":-20, "duration":5.0 }   // 실내 바라보기2
+	     , {"lon":126.92880, "lat":37.51733, "alt":57.32, "heading":310, "pitch":0, "duration":12.0 }    // 건물실내
+				];
+
+	var lowerLayer = null;
+	var lowerLayerIndex = 0;
+	var refreshPeriod = 10000;
+	var upperLayer = null;
+	var upperLayerIndex = 0;
+
+	var timeloop = null;
+
+
+  
 </script>
 
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -50,21 +79,6 @@ html, body, #cesiumContainer {
 
 <script>
 
-var provider = null;
-var url = baseUrl + '/geoserver/uos/wms';
-var baseUrl = "";
-var urlBackup = url;
-	
-var poiList = [
-			  {"lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	
-			, {"lon":127.1204 , "lat":37.54683, "alt":1200, "heading":0, "pitch":-90, "duration":6 }	
-			, {"lon":127.58374, "lat":37.09220, "alt":2230.8844647920923, "heading": 0, "pitch":-90, "duration":4.0 }	
-			, {"lon":126.94217, "lat":37.51820, "alt":256.41, "heading":300, "pitch":-25, "duration":7.0 }	
-			, {"lon":126.92902, "lat":37.51692, "alt":57.200934197465415, "heading":40, "pitch":0, "duration":5.0 }	// 건기연
-			, {"lon":126.92895, "lat":37.51737, "alt":61.57, "heading":150, "pitch":-20, "duration":5.0 }	// 기계실
-			, {"lon":126.92880, "lat":37.51733, "alt":57.32, "heading":310, "pitch":0, "duration":12.0 }	// 건물실내
-			];
-
 $(document).ready(function(){
 	
 	//removeDivForCredit();
@@ -86,6 +100,8 @@ function changePlace(objId){
 	$("#"+ objName + "04").removeClass("on");
 	$("#"+ objName + "05").removeClass("on");
 	$("#"+ objName + "06").removeClass("on");
+	$("#"+ objName + "07").removeClass("on");
+	$("#"+ objName + "08").removeClass("on");
 
 	var position = poiList[objNum];
 	flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
@@ -124,10 +140,17 @@ function changeAutoRefresh(objId){
 
 	var position = poiList[objNum];
 	//flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
-	if(objNum > 0)
-		clearTimeout(timeloop);
-	else 
+	if(objNum == "0"){
+		if(upperLayer == null){
+			upperLayer = addLiveDroneLayer();
+			upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
+		}
 		timeloop = setTimeout(flipPrv, refreshPeriod);
+	} else {
+		if(timeloop != null)
+			clearTimeout(timeloop);
+	} 
+
 	$("#"+ objId).addClass("on");
 }
 	
@@ -175,10 +198,12 @@ function prepareFlyButtons(){
 					<li class="on" id="place00" onclick="changePlace(this.id);">지구</li>
 					<li id="place01" onclick="changePlace(this.id);">광나루 드론공원</li>
 					<li id="place02" onclick="changePlace(this.id);">경기도 이천시</li>
-					<li id="place03" onclick="changePlace(this.id);">여의도</li>
-					<li id="place04" onclick="changePlace(this.id);">실내 바라보기</li>
-					<li id="place05" onclick="changePlace(this.id);">실내 바라보기2</li>
-					<li id="place06" onclick="changePlace(this.id);">건물실내</li>
+					<li id="place03" onclick="changePlace(this.id);">영월 드론공역</li>
+					<li id="place04" onclick="changePlace(this.id);">재난안전연구원</li>
+					<li id="place05" onclick="changePlace(this.id);">여의도</li>
+					<li id="place06" onclick="changePlace(this.id);">실내 바라보기</li>
+					<li id="place07" onclick="changePlace(this.id);">실내 바라보기2</li>
+					<li id="place08" onclick="changePlace(this.id);">건물실내</li>
 				</ul>
 			</div>
 
@@ -207,9 +232,8 @@ function prepareFlyButtons(){
 			<div class="auto">
 				<p>자동갱신</p>
 				<ul>
-					<li class="on" id="autoRefresh00"
-						onclick="changeAutoRefresh(this.id);">on</li>
-					<li id="autoRefresh01" onclick="changeAutoRefresh(this.id);">off</li>
+					<li id="autoRefresh00" onclick="changeAutoRefresh(this.id);">on</li>
+					<li class="on" id="autoRefresh01" onclick="changeAutoRefresh(this.id);">off</li>
 				</ul>
 			</div>
 		</div>
@@ -336,9 +360,8 @@ of the world.\nhttp://www.openstreetmap.org',
 				,transparent : 'true'
 				//,tiled : 'true'
 				,format : 'image/png'
-				,time : 'P1Y/PRESENT'
+				,time : 'P2Y/PRESENT'
 		    	,rand:rand
-		    	,asdf:"asdf"
 				
 			}
 			//,proxy: new Cesium.DefaultProxy('/proxy/')
@@ -371,28 +394,23 @@ of the world.\nhttp://www.openstreetmap.org',
 	
 	*/
 	
-	var lowerLayer = null;
-	var lowerLayerIndex = 0;
+	//var middleLayer = null;
+	//var middleLayerIndex = 0;
 	
-	var middleLayer = null;
-	var middleLayerIndex = 0;
-	
-	var upperLayer = addLiveDroneLayer();
-	var upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer)
-	
-	var refreshPeriod = 5000;
-	var timeloop = null;
-
 	function flipPrv() {
 		
 		if(lowerLayer != null)
 			viewer.imageryLayers.remove(lowerLayer);
-		
+
+		/*
 		lowerLayerIndex = middleLayerIndex;
 		lowerLayer = middleLayer;
-
 		middleLayerIndex = upperLayerIndex;
 		middleLayer = upperLayer;
+		*/
+
+		lowerLayerIndex = upperLayerIndex;
+		lowerLayer = upperLayer;
 
 		upperLayer = addLiveDroneLayer();
 		//lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
@@ -400,7 +418,6 @@ of the world.\nhttp://www.openstreetmap.org',
 
 		timeloop = setTimeout(flipPrv, refreshPeriod);
 	}
-	timeloop = setTimeout(flipPrv, refreshPeriod);
 
 	//var viewer = new Cesium.Viewer('cesiumContainer');
 	viewer.load_TEST_Files();
