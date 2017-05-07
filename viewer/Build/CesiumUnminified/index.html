@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- Use correct character set. -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- Tell IE to use the latest, best version (or Chrome Frame if pre-IE11). -->
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+<!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<title>Cesium and F4D Viewer</title>
+
+<link rel="stylesheet" href="./style.css">
+
+<script>
+	//var baseUrl = "http://lgs.mago3d.com:8080";
+	var baseUrl = location.protocol + "//" + location.hostname+(location.port ? ':'+location.port:'' );
+	
+	var isLiveDroneMap = location.hostname.indexOf("opengds.re.kr") > -1 ;
+	
+	var provider = null;
+	var url = baseUrl + '/geoserver/uos/wms';
+	//var baseUrl = "";
+	var urlBackup = url;
+		
+	var poiList = null;
+	
+	if(isLiveDroneMap){
+	poiList = [
+	     {"name":"blue marble", "lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
+         , {"name":"airfield", "lon":17.8604, "lat":40.4343, "alt":1200, "heading":0, "pitch":-90, "duration":6 }                   // airfield
+	     , {"name":"광나루 드론공원", "lon":127.1204 , "lat":37.54683, "alt":1200, "heading":0, "pitch":-90, "duration":6 }			// 광나루
+	     , {"name":"경기도 이천시", "lon":127.58374, "lat":37.09220, "alt":2230.8844647920923, "heading": 0, "pitch":-90, "duration":4.0 }	// 경기도 이천시
+	     , {"name":"영월 드론공역", "lon":128.472697 , "lat":37.170221, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 영월 드론공역
+	     , {"name":"재난안전연구원", "lon":129.313668 , "lat":35.565735, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 재난안전연구원
+		
+		];
+	} else {
+	poiList = [
+	     {"name":"blue marble", "lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
+	     , {"name":"여의도", "lon":126.94217, "lat":37.51820, "alt":256.41, "heading":300, "pitch":-25, "duration":7.0 }	// 여의도
+	     , {"name":"실내 바라보기", "lon":126.92902, "lat":37.51692, "alt":57.200934197465415, "heading":40, "pitch":0, "duration":5.0 } // 실내 바라보기1
+	     , {"name":"실내 바라보기2", "lon":126.92895, "lat":37.51737, "alt":61.57, "heading":150, "pitch":-20, "duration":5.0 }   // 실내 바라보기2
+	     , {"name":"건물실내", "lon":126.92880, "lat":37.51733, "alt":57.32, "heading":310, "pitch":0, "duration":12.0 }    // 건물실내
+		
+		];
+	}
+	
+
+	var poiListCount = poiList.length;
+	
+	var lowerLayer = null;
+	var lowerLayerIndex = 0;
+	var refreshPeriod = 10000;
+	var upperLayer = null;
+	var upperLayerIndex = 0;
+
+	var timeloop = null;
+
+
+  
+</script>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<script src="../Build/CesiumUnminified/Cesium.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Atmosphere.js"></script>
+<script type="text/javascript" src="./f4d/MoveCubeLibsJScript.js"></script>
+<script type="text/javascript" src="./f4d/SonGeometryJScript.js"></script>
+<script type="text/javascript" src="./f4d/SonGeometryModifier.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Projects.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Shader.js"></script>
+<script type="text/javascript" src="./f4d/F4D_ReaderWriter.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Renderer.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Selection.js"></script>
+<script type="text/javascript" src="./f4d/F4D_VBO_Manager.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Manager.js"></script>
+<script type="text/javascript" src="./f4d/F4D_PostFxShader.js"></script>
+<script type="text/javascript" src="./f4d/F4D_FBO.js"></script>
+<script type="text/javascript" src="./f4d/PreGL.js"></script>
+<script type="text/javascript" src="./f4d/F4D_Geometry.js"></script>
+
+
+<style>
+@import url(../Build/Cesium/Widgets/widgets.css);
+
+html, body, #cesiumContainer {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+</style>
+
+
+<script>
+
+$(document).ready(function(){
+	
+	//removeDivForCredit();
+	// add post render listner - start
+	//viewer.scene.postRender.addEventListener(testFunctionForPostRender);
+	// add post render listner - end
+
+	for(var i = 0 ; i < poiListCount ; i++){
+		$("#poiBtn").append($("<li id='place0"+i+"' onclick='changePlace(this.id);'>" + poiList[i].name + "</li>"));
+	}
+	
+	if(isLiveDroneMap){
+		changePlace("place01");
+	} else {
+		$("#autoRefreshBtn").hide();
+		changePlace("place00");
+	}
+});
+	
+	
+function changePlace(objId){
+	var objName = objId.substring(0,objId.length - 2);
+	var objNum = objId.substring(objId.length-1,objId.length);
+	
+	for(var i = 0 ; i < poiListCount ; i++){
+		$("#"+ objName + "0" + i).removeClass("on");
+	}
+
+	var position = poiList[objNum];
+	flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
+	$("#"+ objId).addClass("on");
+}
+
+function changeBgMap(objId){
+	var objName = objId.substring(0,objId.length - 2);
+	var objNum = objId.substring(objId.length-1,objId.length);
+	$("#"+ objName + "00").removeClass("on");
+	$("#"+ objName + "01").removeClass("on");
+
+	var position = poiList[objNum];
+	flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
+	$("#"+ objId).addClass("on");
+}
+
+function changeDrMap(objId){
+	var objName = objId.substring(0,objId.length - 2);
+	var objNum = objId.substring(objId.length-1,objId.length);
+	$("#"+ objName + "00").removeClass("on");
+	$("#"+ objName + "01").removeClass("on");
+
+	var position = poiList[objNum];
+	
+	//flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
+	
+	$("#"+ objId).addClass("on");
+}
+
+function changeAutoRefresh(objId){
+	var objName = objId.substring(0,objId.length - 2);
+	var objNum = objId.substring(objId.length-1,objId.length);
+	$("#"+ objName + "00").removeClass("on");
+	$("#"+ objName + "01").removeClass("on");
+
+	var position = poiList[objNum];
+	//flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
+	if(objNum == "0"){
+		if(upperLayer == null){
+			upperLayer = addLiveDroneLayer();
+			upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
+		}
+		timeloop = setTimeout(flipPrv, refreshPeriod);
+	} else {
+		if(timeloop != null)
+			clearTimeout(timeloop);
+	} 
+
+	$("#"+ objId).addClass("on");
+}
+	
+
+function flyToPosition(viewer, lon, lat, alt, heading, pitch, duration){
+	 viewer.camera.flyTo({
+        destination : Cesium.Cartesian3.fromDegrees(lon, lat, alt),
+        orientation : {
+            heading : Cesium.Math.toRadians(heading),
+            pitch : Cesium.Math.toRadians(pitch),
+            roll : 0.0
+        },
+		duration: duration
+    });
+}
+
+function prepareFlyButtons(){
+
+	var divUL = document.getElementById('divUpperLeft');
+    if (!divUL) {
+        divUL = document.createElement('div');
+        divUL.id = 'divUpperLeft';
+        divUL.style.position = "absolute";
+        divUL.style.background = "rgba(0,0,0,0)";
+        divUL.style.left = "10px";
+        divUL.style.top = "10px";
+        divUL.innerHTML = "";
+        divUL.style.zIndex = 2000;
+        document.getElementById("cesiumContainer").appendChild(divUL);
+    }
+	
+}
+
+</script>
+
+
+</head>
+<body>
+
+	<div id="wrap">
+		<div class="control" style="z-index: 10000;">
+			<div class="place">
+				<p>장소</p>
+				<ul id="poiBtn">
+				</ul>
+			</div>
+
+			<!--		
+        <div class="basemap">
+        	<p>
+            	배경지도
+            </p>
+        	<ul>
+            	<li id="bgMap00" onclick="changeBgMap(this.id);">없음</li>
+                <li class="on" id="bgMap01" onclick="changeBgMap(this.id);">ESRI 위성지도</li>
+                <li id="bgMap02" onclick="changeBgMap(this.id);">OSM 수치지도</li>
+            </ul>
+        </div>
+        <div class="drone">
+        	<p>
+            	드론맵
+            </p>
+        	<ul>
+                <li class="on" id="drMap00" onclick="changeDrMap(this.id);">on</li>
+                <li id="drMap01" onclick="changeDrMap(this.id);">off</li>
+            </ul>
+        </div>
+-->
+
+			<div class="auto" id="autoRefreshBtn">
+				<p>자동갱신</p>
+				<ul>
+					<li id="autoRefresh00" onclick="changeAutoRefresh(this.id);">on</li>
+					<li class="on" id="autoRefresh01" onclick="changeAutoRefresh(this.id);">off</li>
+				</ul>
+			</div>
+		</div>
+		<!-- END CONTROL -->
+		<div class="map" id="cesiumContainer"></div>
+		<script>
+  
+	var providerViewModels = [];
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name : 'ESRI World Imagery',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/esriWorldImagery.png'),
+		tooltip : '\
+World Imagery provides one meter or better satellite and aerial imagery in many parts of the world and lower resolution \
+satellite imagery worldwide.  The map includes NASA Blue Marble: Next Generation 500m resolution imagery at small scales \
+(above 1:1,000,000), i-cubed 15m eSAT imagery at medium-to-large scales (down to 1:70,000) for the world, and USGS 15m Landsat \
+imagery for Antarctica. The map features 0.3m resolution imagery in the continental United States and 0.6m resolution imagery in \
+parts of Western Europe from DigitalGlobe. In other parts of the world, 1 meter resolution imagery is available from GeoEye IKONOS, \
+i-cubed Nationwide Prime, Getmapping, AeroGRID, IGN Spain, and IGP Portugal.  Additionally, imagery at different resolutions has been \
+contributed by the GIS User Community.\nhttp://www.esri.com',
+		creationFunction : function() {
+			return new Cesium.ArcGisMapServerImageryProvider({
+				url : '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+				enablePickFeatures : false
+			});
+		}
+	}));
+		
+	 providerViewModels.push(new Cesium.ProviderViewModel({
+		name : 'Open\u00adStreet\u00adMap',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
+		tooltip : 'OpenStreetMap (OSM) is a collaborative project to create a free editable map \
+of the world.\nhttp://www.openstreetmap.org',
+		creationFunction : function() {
+			return new Cesium.OpenStreetMapImageryProvider({
+				url : '//a.tile.openstreetmap.org/'
+			});
+		}
+	}));
+	
+	
+	 providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Satellite',
+		tooltip: 'Mapbox satellite imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxSatellite.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.satellite'
+			});
+		}
+	}));
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Streets',
+		tooltip: 'Mapbox streets imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxTerrain.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.streets'
+			});
+		}
+	}));
+
+	providerViewModels.push(new Cesium.ProviderViewModel({
+		name: 'Mapbox Streets Classic',
+		tooltip: 'Mapbox streets basic imagery https://www.mapbox.com/maps/',
+		iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxStreets.png'),
+		creationFunction: function() {
+			return new Cesium.MapboxImageryProvider({
+				mapId: 'mapbox.streets-basic'
+			});
+		}
+	}));
+
+	var terrainViewModels = [];
+	terrainViewModels.push(new Cesium.ProviderViewModel({
+		name : 'WGS84 Ellipsoid',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/Ellipsoid.png'),
+		tooltip : 'WGS84 standard ellipsoid, also known as EPSG:4326',
+		creationFunction : function() {
+			return new Cesium.EllipsoidTerrainProvider();
+		}
+	}));
+
+
+	terrainViewModels.push(new Cesium.ProviderViewModel({
+		name : 'STK World Terrain meshes',
+		iconUrl : Cesium.buildModuleUrl('Widgets/Images/TerrainProviders/STK.png'),
+		tooltip : 'High-resolution, mesh-based terrain for the entire globe. Free for use on the Internet. Closed-network options are available.\nhttp://www.agi.com',
+		creationFunction : function() {
+			return new Cesium.CesiumTerrainProvider({
+				url : '//assets.agi.com/stk-terrain/world',
+				requestWaterMask : true,
+				requestVertexNormals : true
+			});
+		}
+	}));
+
+	
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+		timeline : false
+		,animation : false
+		//,credit : false
+		,imageryProviderViewModels : providerViewModels
+		,selectedImageryProviderViewModel : providerViewModels[0]
+		,terrainProviderViewModels : terrainViewModels
+		,selectedTerrainProviderViewModel : terrainViewModels[1]
+	});
+	
+	
+	function addLiveDroneLayer(index) {
+	    var now = new Date();
+	    var rand = ( now - now % 5000) / 5000;
+
+	    provider = new Cesium.WebMapServiceImageryProvider({
+			//url : 'http://192.168.10.38:8081/geoserver/uos/wms',
+			//url : 'http://lgs.mago3d.com:8080/geoserver/uos/wms',
+			url : url,
+			layers : 'uos:uos_upload_image',
+			parameters : {
+				service : 'WMS'
+				,version : '1.1.1'
+				,request : 'GetMap'
+				,transparent : 'true'
+				//,tiled : 'true'
+				,format : 'image/png'
+				,time : 'P2Y/PRESENT'
+		    	,rand:rand
+				
+			}
+			//,proxy: new Cesium.DefaultProxy('/proxy/')
+		});
+
+		if (index)
+			return viewer.imageryLayers.addImageryProvider(provider, index);
+		else
+			return viewer.imageryLayers.addImageryProvider(provider);
+	}
+
+	function removeLiveDroneLayer(index) {
+			
+		if(index < 1 )
+			url = urlBackup;
+		else 
+			url = null;
+			
+		provider = null;
+		//viewer.imageryLayers.
+	}
+
+	
+	/*
+	var lowerLayer = addLiveDroneLayer();
+	var lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
+	
+	var upperLayer = addLiveDroneLayer();
+	var upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
+	
+	*/
+	
+	//var middleLayer = null;
+	//var middleLayerIndex = 0;
+	
+	function flipPrv() {
+		
+		if(lowerLayer != null)
+			viewer.imageryLayers.remove(lowerLayer);
+
+		/*
+		lowerLayerIndex = middleLayerIndex;
+		lowerLayer = middleLayer;
+		middleLayerIndex = upperLayerIndex;
+		middleLayer = upperLayer;
+		*/
+
+		lowerLayerIndex = upperLayerIndex;
+		lowerLayer = upperLayer;
+
+		upperLayer = addLiveDroneLayer();
+		//lowerLayerIndex = viewer.imageryLayers.indexOf(lowerLayer);
+		upperLayerIndex = viewer.imageryLayers.indexOf(upperLayer);
+
+		timeloop = setTimeout(flipPrv, refreshPeriod);
+	}
+
+	//var viewer = new Cesium.Viewer('cesiumContainer');
+	if(!isLiveDroneMap){
+		viewer.load_TEST_Files();
+	}
+	
+	//setTimeout(doSomething, 4000);
+
+		// Start postRender version.***********************************************
+	var f4d_topManager = new f4d_manager();
+	var scene = viewer.scene;
+	//scene.copyGlobeDepth = true;
+	f4d_topManager.scene = scene;
+	var GL = scene.context._gl;
+	var context = scene.context;
+	
+	viewer.scene.globe.depthTestAgainstTerrain = true;
+	
+	f4d_topManager.f4dSelection.init(GL, scene.drawingBufferWidth, scene.drawingBufferHeight);
+	f4d_topManager.f4d_shadersManager.create_f4dDefaultShader(GL); 
+	f4d_topManager.f4d_postFxShadersManager.create_defaultShaders(GL); 
+	
+	var f4d_readerWriter = new f4d_ReaderWriter();
+	
+	
+	//var texture = context.createTexture2D({ width : scene.drawingBufferWidth, height : scene.drawingBufferHeight });
+	//var myFramebuffer = context.createFramebuffer({ colorTexture : texture });
+	
+	
+	
+	var BR_ProjectsList = f4d_topManager.f4dBR_buildingProjectsList;
+	var neoBuildingsList = f4d_topManager.f4d_neoBuildingsList;
+	
+	//f4d_readerWriter.openF4d_TerranTile(GL, f4d_topManager.f4d_terranTile, f4d_readerWriter);
+	//f4d_readerWriter.openBuildingProject(GL, 130, 37.5172076, 126.929, 60.0, this.f4d_readerWriter, BR_ProjectsList, f4d_topManager);
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
+	var buildingFileName = "F4D_gangnam_del";
+	//f4d_readerWriter.openNeoBuilding(GL, buildingFileName, 37.5172076, 126.929, 60.0, f4d_readerWriter, neoBuildingsList, f4d_manager);
+
+	var entities = viewer.entities;
+		entities.add({
+			name : 'Blue box',
+			position: Cesium.Cartesian3.fromDegrees(126.92734533517019, 37.517207695444, 1500.0), // usa = (-114.0, 40.0, 300000.0), songdo = (126.6554, 37.3853, 300000.0)
+			box : {
+				dimensions : new Cesium.Cartesian3(300000.0, 300000.0, 300000.0), // dimensions : new Cesium.Cartesian3(400000.0, 300000.0, 500000.0),
+				material : Cesium.Color.TRANSPARENT
+			}
+		});
+		
+	</script>
+	</div>
+</body>
+</html>

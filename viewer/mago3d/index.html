@@ -15,26 +15,42 @@
 	//var baseUrl = "http://lgs.mago3d.com:8080";
 	var baseUrl = location.protocol + "//" + location.hostname+(location.port ? ':'+location.port:'' );
 	
+	var isLiveDroneMap = location.hostname.indexOf("opengds.re.kr") > -1 ;
+	
 	var provider = null;
 	var url = baseUrl + '/geoserver/uos/wms';
 	//var baseUrl = "";
 	var urlBackup = url;
 		
-	var poiList = [
-	     {"lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
-	     , {"lon":127.1204 , "lat":37.54683, "alt":1200, "heading":0, "pitch":-90, "duration":6 }			// 광나루
-	     , {"lon":127.58374, "lat":37.09220, "alt":2230.8844647920923, "heading": 0, "pitch":-90, "duration":4.0 }	// 경기도 이천시
-	     , {"lon":128.472697 , "lat":37.170221, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 영월 드론공역
-	     , {"lon":129.313668 , "lat":35.565735, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 재난안전연구원
-	     , {"lon":126.94217, "lat":37.51820, "alt":256.41, "heading":300, "pitch":-25, "duration":7.0 }	// 여의도
-	     , {"lon":126.92902, "lat":37.51692, "alt":57.200934197465415, "heading":40, "pitch":0, "duration":5.0 } // 실내 바라보기1
-	     , {"lon":126.92895, "lat":37.51737, "alt":61.57, "heading":150, "pitch":-20, "duration":5.0 }   // 실내 바라보기2
-	     , {"lon":126.92880, "lat":37.51733, "alt":57.32, "heading":310, "pitch":0, "duration":12.0 }    // 건물실내
-				];
+	var poiList = null;
+	
+	if(isLiveDroneMap){
+	poiList = [
+	     {"name":"blue marble", "lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
+         , {"name":"airfield", "lon":17.8604, "lat":40.4343, "alt":1200, "heading":0, "pitch":-90, "duration":6 }                   // airfield
+	     , {"name":"광나루 드론공원", "lon":127.1204 , "lat":37.54683, "alt":1200, "heading":0, "pitch":-90, "duration":6 }			// 광나루
+	     , {"name":"경기도 이천시", "lon":127.58374, "lat":37.09220, "alt":2230.8844647920923, "heading": 0, "pitch":-90, "duration":4.0 }	// 경기도 이천시
+	     , {"name":"영월 드론공역", "lon":128.472697 , "lat":37.170221, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 영월 드론공역
+	     , {"name":"재난안전연구원", "lon":129.313668 , "lat":35.565735, "alt":1200, "heading":0, "pitch":-90, "duration":6 }		// 재난안전연구원
+		
+		];
+	} else {
+	poiList = [
+	     {"name":"blue marble", "lon":128.54953, "lat":36.20619, "alt":18110571.0, "heading":0, "pitch":-90 , "duration":5.0}	// 지구
+	     , {"name":"여의도", "lon":126.94217, "lat":37.51820, "alt":256.41, "heading":300, "pitch":-25, "duration":7.0 }	// 여의도
+	     , {"name":"실내 바라보기", "lon":126.92902, "lat":37.51692, "alt":57.200934197465415, "heading":40, "pitch":0, "duration":5.0 } // 실내 바라보기1
+	     , {"name":"실내 바라보기2", "lon":126.92895, "lat":37.51737, "alt":61.57, "heading":150, "pitch":-20, "duration":5.0 }   // 실내 바라보기2
+	     , {"name":"건물실내", "lon":126.92880, "lat":37.51733, "alt":57.32, "heading":310, "pitch":0, "duration":12.0 }    // 건물실내
+		
+		];
+	}
+	
 
+	var poiListCount = poiList.length;
+	
 	var lowerLayer = null;
 	var lowerLayerIndex = 0;
-	var refreshPeriod = 10000;
+	var refreshPeriod = 5000;
 	var upperLayer = null;
 	var upperLayerIndex = 0;
 
@@ -85,23 +101,27 @@ $(document).ready(function(){
 	// add post render listner - start
 	//viewer.scene.postRender.addEventListener(testFunctionForPostRender);
 	// add post render listner - end
+
+	for(var i = 0 ; i < poiListCount ; i++){
+		$("#poiBtn").append($("<li id='place0"+i+"' onclick='changePlace(this.id);'>" + poiList[i].name + "</li>"));
+	}
 	
-	changePlace("place00");
+	if(isLiveDroneMap){
+		changePlace("place01");
+	} else {
+		$("#autoRefreshBtn").hide();
+		changePlace("place00");
+	}
 });
 	
 	
 function changePlace(objId){
 	var objName = objId.substring(0,objId.length - 2);
 	var objNum = objId.substring(objId.length-1,objId.length);
-	$("#"+ objName + "00").removeClass("on");
-	$("#"+ objName + "01").removeClass("on");
-	$("#"+ objName + "02").removeClass("on");
-	$("#"+ objName + "03").removeClass("on");
-	$("#"+ objName + "04").removeClass("on");
-	$("#"+ objName + "05").removeClass("on");
-	$("#"+ objName + "06").removeClass("on");
-	$("#"+ objName + "07").removeClass("on");
-	$("#"+ objName + "08").removeClass("on");
+	
+	for(var i = 0 ; i < poiListCount ; i++){
+		$("#"+ objName + "0" + i).removeClass("on");
+	}
 
 	var position = poiList[objNum];
 	flyToPosition(viewer, position.lon, position.lat, position.alt, position.heading, position.pitch, position.duration);
@@ -194,16 +214,7 @@ function prepareFlyButtons(){
 		<div class="control" style="z-index: 10000;">
 			<div class="place">
 				<p>장소</p>
-				<ul>
-					<li class="on" id="place00" onclick="changePlace(this.id);">지구</li>
-					<li id="place01" onclick="changePlace(this.id);">광나루 드론공원</li>
-					<li id="place02" onclick="changePlace(this.id);">경기도 이천시</li>
-					<li id="place03" onclick="changePlace(this.id);">영월 드론공역</li>
-					<li id="place04" onclick="changePlace(this.id);">재난안전연구원</li>
-					<li id="place05" onclick="changePlace(this.id);">여의도</li>
-					<li id="place06" onclick="changePlace(this.id);">실내 바라보기</li>
-					<li id="place07" onclick="changePlace(this.id);">실내 바라보기2</li>
-					<li id="place08" onclick="changePlace(this.id);">건물실내</li>
+				<ul id="poiBtn">
 				</ul>
 			</div>
 
@@ -229,7 +240,7 @@ function prepareFlyButtons(){
         </div>
 -->
 
-			<div class="auto">
+			<div class="auto" id="autoRefreshBtn">
 				<p>자동갱신</p>
 				<ul>
 					<li id="autoRefresh00" onclick="changeAutoRefresh(this.id);">on</li>
@@ -420,8 +431,10 @@ of the world.\nhttp://www.openstreetmap.org',
 	}
 
 	//var viewer = new Cesium.Viewer('cesiumContainer');
-	viewer.load_TEST_Files();
-
+	if(!isLiveDroneMap){
+		viewer.load_TEST_Files();
+	}
+	
 	//setTimeout(doSomething, 4000);
 
 		// Start postRender version.***********************************************

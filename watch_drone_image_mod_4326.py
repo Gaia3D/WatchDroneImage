@@ -111,7 +111,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
         #subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff', '-s_srs', 'EPSG:5186', '-t_srs', 'EPSG:4326',  nb_file, trans_file])
         #subprocess.call(['gdalwarp', '-r', 'cubic', '-of', 'GTiff',  path, trans_file])
         subprocess.call(['gdal_translate', '-of', 'GTiff', '-co', 'TILED=YES', path, tiled_file])
-        subprocess.call(['gdaladdo', '-r', 'average', tiled_file, '2', '4', '8', '16', '32', '64'])
+        subprocess.call(['gdaladdo', '-r', 'average', tiled_file, '2', '4', '8', '16', '32', '64', '128', '256' , '512'])
         # os.remove(nb_file)
         #os.remove(trans_file)
 
@@ -182,5 +182,7 @@ if __name__ == "__main__":
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
-        
+
+    if observer.isAlive() :
+        observer.stop()
     observer.join()
