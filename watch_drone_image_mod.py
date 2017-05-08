@@ -48,9 +48,7 @@ class CompleteEventHandler(PatternMatchingEventHandler):
 
     def __init__(self, patterns=None, ignore_patterns=None,
             ignore_directories=False, case_sensitive=False):
-        if patterns:
-            patterns = self.PATTERN
-            
+        patterns = self.PATTERN
         super(CompleteEventHandler, self).__init__(patterns, ignore_patterns, ignore_directories, case_sensitive)
 
         self.connectDB()

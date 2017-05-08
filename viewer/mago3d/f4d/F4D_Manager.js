@@ -784,7 +784,7 @@ f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, c
 			// Must read the header file.***
 			if(this.backGround_fileReadings_count < 20)
 			{
-				filePath_scratch = baseUrl + "F4D_GeometryData/" + pCloudProject._f4d_headerPathName;
+				filePath_scratch = "/F4D_GeometryData/" + pCloudProject._f4d_headerPathName;
 				
 				this.f4d_readerWriter.readF4D_pCloudHeader_inServer(GL, filePath_scratch, pCloudProject, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
@@ -795,7 +795,7 @@ f4d_manager.prototype.render_F4D_pCloudProjects = function(GL, cameraPosition, c
 		{
 			if(this.backGround_fileReadings_count < 20)
 			{
-				filePath_scratch = baseUrl + "F4D_GeometryData/" + pCloudProject._f4d_geometryPathName;
+				filePath_scratch = "/F4D_GeometryData/" + pCloudProject._f4d_geometryPathName;
 				
 				this.f4d_readerWriter.readF4D_pCloudGeometry_inServer(GL, filePath_scratch, pCloudProject, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
@@ -1513,7 +1513,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 					if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 					{
 						//filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
 						
 						this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
 						this.backGround_fileReadings_count ++;
@@ -1705,7 +1705,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat_PostFxShader =
 							if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 							{
 								//filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-								filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+								filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
 								
 								this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
 								this.backGround_fileReadings_count ++;
@@ -2043,7 +2043,7 @@ f4d_manager.prototype.render_F4D_Projects_TerranTileServiceFormat = function(GL,
 					if(!this.isCameraMoving && this.backGround_fileReadings_count < 1)
 					{
 						//filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_rawPathName + ".jpg"; // Old.***
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/Images/" + BR_Project._header._global_unique_id + ".jpg";
 						
 						this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this, 0); 
 						this.backGround_fileReadings_count ++;
@@ -2307,7 +2307,7 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 					// Must read the header file.***
 					if(this.backGround_fileReadings_count < 40)
 					{
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_headerPathName;
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_headerPathName;
 						this.f4d_readerWriter.readF4D_Header_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this);
 						this.backGround_fileReadings_count ++;
 					}
@@ -2317,7 +2317,7 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 				{
 					if(this.backGround_fileReadings_count < 40)
 					{
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_simpleBuildingPathName;
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_simpleBuildingPathName;
 						
 						this.f4d_readerWriter.readF4D_SimpleBuinding_A1_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this);
 						this.backGround_fileReadings_count ++;
@@ -2328,7 +2328,7 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 				{
 					if(this.backGround_fileReadings_count < 40)
 					{
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_nailImagePathName;
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._f4d_nailImagePathName;
 						
 						this.f4d_readerWriter.readF4D_NailImage_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this);
 						this.backGround_fileReadings_count ++;
@@ -2339,7 +2339,7 @@ f4d_manager.prototype.render_F4D_Projects_SPEEDTEST = function(GL, cameraPositio
 				{
 					if(this.backGround_fileReadings_count < 40)
 					{
-						filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/" + BR_Project._xdo_simpleBuildingPathName;
+						filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/" + BR_Project._xdo_simpleBuildingPathName;
 						
 						this.f4d_readerWriter.readXDO_SimpleBuinding_A1_inServer(GL, filePath_scratch, BR_Project, this.f4d_readerWriter, this);
 						this.backGround_fileReadings_count ++;
@@ -2743,7 +2743,7 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
 				this.f4d_readerWriter.readF4D_TileArrayBuffer_inServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -2846,7 +2846,7 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
 				this.f4d_readerWriter.readF4D_TileArrayBuffer_inServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
@@ -2915,7 +2915,7 @@ f4d_manager.prototype.doFrustumCulling_terranTile_serviceFormat = function(GL, f
 			if(this.backGround_fileReadings_count < max_tileFilesReading)
 			{
 				tileNumberNameString = this.terranTileSC._numberName.toString();
-				filePath_scratch = baseUrl + "F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
+				filePath_scratch = "/F4D_GeometryData/Result_xdo2f4d/F4D_TerrainTiles/" + tileNumberNameString + ".til";	
 				this.f4d_readerWriter.readF4D_TileArrayBuffer_inServer(GL, filePath_scratch, this.terranTileSC, this.f4d_readerWriter, this);
 				this.backGround_fileReadings_count ++;
 			}
