@@ -3058,7 +3058,8 @@ f4d_TerranTile.prototype.parseFile_header = function(BR_Project)
 	header._boundingBox._maxZ = (new Float32Array(arrayBuffer.slice(bytes_readed, bytes_readed+4)))[0]; bytes_readed += 4;
 	
 	var semiHeight = (header._boundingBox._maxZ - header._boundingBox._minZ )/2.0;
-	header._elevation = 45.0 + semiHeight-0.5;
+	//header._elevation = 45.0 + semiHeight-0.5;
+	header._elevation = 105.0 + semiHeight-0.5;
 	
 	var isLarge = false;
 	if(header._boundingBox._maxX - header._boundingBox._minX > 40.0 || header._boundingBox._maxY - header._boundingBox._minY > 40.0)

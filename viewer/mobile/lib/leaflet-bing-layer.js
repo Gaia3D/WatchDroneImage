@@ -133,6 +133,8 @@ L.TileLayer.Bing = L.TileLayer.extend({
   },
 
   getTileUrl: function (coords) {
+  	// bing layer의 nativezoom 인식 버그를 해결하기 위해 코드 추가... 20170529 sgshs
+    if (coords.z > this.options.maxNativeZoom) { coords.z = this.options.maxNativeZoom; }
     var quadkey = toQuadKey(coords.x, coords.y, coords.z)
     return L.Util.template(this._url, {
       quadkey: quadkey,

@@ -3062,7 +3062,6 @@ f4d_manager.prototype.doFrustumCulling_clouds = function(frustumVolume, visibleB
 
 
 
-//# sourceURL=f4d_manager.js
 
 
 
