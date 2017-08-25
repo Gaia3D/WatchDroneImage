@@ -27,7 +27,7 @@
 
   //var WMS_URL = "http://lgs.mago3d.com:8080/geoserver/wms";
   
-  var WMS_URL = baseUrl + '/geoserver/uos/wms';
+  var WMS_URL = baseUrl + '/geoserver/uos/gwc/service/wms';
   var WMS_CAPABILITIES_URL = WMS_URL + "?service=wms&version=1.1.1&request=GetCapabilities";
   var WMS_LAYER = "uos:uos_upload_image";
   var REFLASH_TIME = 10000;
@@ -105,8 +105,10 @@
   
   var lowOdmLayer = null;
   var highOdmLayer = null;
+  
   function loadOdmLayer() {
-    var now = new Date();
+
+	var now = new Date();
     //var rand = ( now - now % 5000) / 5000;
     if (!highOdmLayer) { // 초기화 안된 경우
       highOdmLayer = L.tileLayer.wms(WMS_URL, {
@@ -122,6 +124,7 @@
 	   ,headers:{'Cache-Control':'max-age=604800, public'}
       }).addTo(map);
       layerControl.addOverlay(highOdmLayer, "LiveDroneMap");
+	  console.log("highOdmLayer.addTo()");
       
       // 지정 시간 경과후 계속 다시 로드
       setInterval(loadOdmLayer, REFLASH_TIME);
@@ -139,41 +142,38 @@
 	    ,maxNativeZoom:23
 	    ,headers:{'Cache-Control':'max-age=604800, public'}
       });
-      lowOdmLayer.bringToBack();
+      lowOdmLayer.bringToFront();
+	  console.log("lowOdmLayer.addTo()");
       
       // 켜져있는 상태인지 확인
       if (map.hasLayer(highOdmLayer)) {
         lowOdmLayer.addTo(map);
-      }
-      
-      // 다 로드되었다는 이벤트 받으면 순서 뒤집기
-      lowOdmLayer.on('load', flipOdmLayer);
+
+		// 다 로드되었다는 이벤트 받으면 순서 뒤집기
+		lowOdmLayer.on('load', flipOdmLayer);
+ 	  }
+	  
     }
   }
   
   function flipOdmLayer() {
+  
     if (!lowOdmLayer) return;
     
-    // ODM Layer 상태 보존
-    var isOn = map.hasLayer(highOdmLayer);
-    if (isOn) {
-      if (!map.hasLayer(lowOdmLayer))
-        lowOdmLayer.addTo(map);
-    } else {
-      if (map.hasLayer(lowOdmLayer))
-        lowOdmLayer.remove();
-    }
-    
-    // 백그라운드에서 로딩된 이미지 앞으로 올리고
-    lowOdmLayer.bringToFront();
-    highOdmLayer.remove();
+	// 레이어 콘트롤도 다시 갱신
+	//lowOdmLayer.bringToFront();
 
-    // 레이어 콘트롤도 다시 갱신
-    layerControl.removeLayer(highOdmLayer);
-    highOdmLayer = lowOdmLayer;
-    //layerControl.addOverlay(highOdmLayer, "OpenDroneMap");
-    layerControl.addOverlay(highOdmLayer, "LiveDroneMap");
-    
+	layerControl.removeLayer(highOdmLayer);
+	highOdmLayer.remove();
+	console.log("highOdmLayer.remove()");
+
+	highOdmLayer = lowOdmLayer;
+	//layerControl.addOverlay(highOdmLayer, "OpenDroneMap");
+	layerControl.addOverlay(highOdmLayer, "LiveDroneMap");
+
+    // 백그라운드에서 로딩된 이미지 앞으로 올리고
+    //alert("222");
+
     lowOdmLayer = null;
   }
 </script></body>
